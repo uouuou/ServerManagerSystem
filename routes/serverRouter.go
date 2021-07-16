@@ -50,7 +50,7 @@ func ServerRouter() {
 	r.Static("/css", mid.Dir+"/web/css")
 	r.StaticFS("/upload", http.Dir(mid.Dir+"/upload"))
 	r.Static("/static", mid.Dir+"/web/static")
-	r.StaticFile("/favicon.ico", "/web/favicon.ico")
+	r.StaticFile("/favicon.ico", mid.Dir+"/web/favicon.ico")
 	r.GET("/login", func(c *gin.Context) {
 		c.HTML(200, "front", nil)
 	})
