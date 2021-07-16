@@ -46,29 +46,29 @@
   ./ServerManagerSystem_linux_amd64_upx -m client uninstall
   ```
  - 配置文件解析：
-  ```shelL
-  # 服务器端：
-  # setting:
-  port :服务端运行端口
-  runDir :程序运行路径
-  redType :xftp读取为了将的后缀名
-  rpcPort :客户端登录的RPC通信端口
-  auth :客户端与服务端的通信密钥
-  # sql:
-  dbType :数据库类型目前支持mysql和sqllite 默认使用sqllite如果需要mysql请在后方配置
-  dbName: ""
-  DbUser: ""
-  DbPass: ""
-  DbHost: ""
-  DbPort: 0
-  # 客户端：
-  port: 客户端运行端口
-  runDir : 客户端运行位置
-  server : 服务端地址例如 tcp://127.0.0.1:8001
-  userid : 客户端唯一识别码 自动生成 先运行client客户端生成uuid以后再配置文件
-  serverHttp : 服务端http地址 例如 http://127.0.0.1:8000
-  auth : 客户端与服务端的通信密钥 两端保持一致
-   ```
+    ```shelL
+    # 服务器端：
+    # setting:
+    port :服务端运行端口
+    runDir :程序运行路径
+    redType :xftp读取为了将的后缀名
+    rpcPort :客户端登录的RPC通信端口     
+    auth :客户端与服务端的通信密钥
+    # sql:
+    dbType :数据库类型目前支持mysql和sqllite 默认使用sqllite如果需要mysql请在后方配置
+    dbName: ""
+    DbUser: ""
+    DbPass: ""
+    DbHost: ""
+    DbPort: 0
+    # 客户端：
+    port: 客户端运行端口
+    runDir : 客户端运行位置
+    server : 服务端地址例如 tcp://127.0.0.1:8001
+    userid : 客户端唯一识别码 自动生成 先运行client客户端生成uuid以后再配置文件
+    serverHttp : 服务端http地址 例如 http://127.0.0.1:8000
+    auth : 客户端与服务端的通信密钥 两端保持一致
+    ```
 
 #### 界面展示
 
