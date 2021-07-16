@@ -49,7 +49,7 @@
     ```shelL
     # 服务器端：
     # setting:
-    port :服务端运行端口
+    port :服务端运行端口 (WEB页面访问该端口即可)
     runDir :程序运行路径
     redType :xftp读取为了将的后缀名
     rpcPort :客户端登录的RPC通信端口     
