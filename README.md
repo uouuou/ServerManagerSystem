@@ -27,16 +27,16 @@
    ```
 
 - 编译并使用本程序
-    ```shelL
-      git clone https://github.com/uouuou/ServerManagerSystem.git
-      sh build.sh
-      cp -r ./web ./output
-      cd output
-      chemo -R 755 ServerManagerSystem_linux_amd64_upx 
-      ./ServerManagerSystem_linux_amd64_upx  install
-      service serverManagerSystem_server start
-      journalctl -u serverManagerSystem_server.service -f
-    ```
+  ```shelL
+  git clone https://github.com/uouuou/ServerManagerSystem.git
+  sh build.sh
+  cp -r ./web ./output
+  cd output
+  chemo -R 755 ServerManagerSystem_linux_amd64_upx 
+  ./ServerManagerSystem_linux_amd64_upx  install
+  service serverManagerSystem_server start
+  journalctl -u serverManagerSystem_server.service -f
+  ```
   ```shelL
   # 客户端模式下
   ./ServerManagerSystem_linux_amd64_upx -m client install
@@ -54,7 +54,7 @@
   redType :xftp读取为了将的后缀名
   rpcPort :客户端登录的RPC通信端口
   auth :客户端与服务端的通信密钥
-   # sql:
+  # sql:
   dbType :数据库类型目前支持mysql和sqllite 默认使用sqllite如果需要mysql请在后方配置
   dbName: ""
   DbUser: ""
