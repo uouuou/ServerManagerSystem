@@ -24,9 +24,5 @@ func AuthAll() gin.HandlerFunc {
 }
 
 func HandleNotFound(c *gin.Context) {
-	c.JSON(http.StatusNotFound, gin.H{
-		"code":    "404",
-		"status":  false,
-		"message": "Page Not Found",
-	})
+	c.Redirect(http.StatusMovedPermanently, "/404")
 }

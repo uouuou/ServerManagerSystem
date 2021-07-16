@@ -26,26 +26,39 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 )
+
+func createMyRender() multitemplate.Renderer {
+	p := multitemplate.NewRenderer()
+	p.AddFromFiles("front", "web/index.html")
+	return p
+}
 
 // ServerRouter 服务端路由
 func ServerRouter() {
 	gin.ForceConsoleColor()
 	r := gin.New()
+	r.HTMLRender = createMyRender()
 	r.NoRoute(mid.HandleNotFound)
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(mid.Cors())
 	// 为 multipart forms 设置较低的内存限制 (默认是 32 MiB)
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
-	r.LoadHTMLGlob(mid.Dir + "/web/*.html")
 	r.Static("/css", mid.Dir+"/web/css")
 	r.StaticFS("/upload", http.Dir(mid.Dir+"/upload"))
 	r.Static("/static", mid.Dir+"/web/static")
-	//r.GET("/web", func(c *gin.Context) {
-	//	c.HTML(200, "index.html", gin.H{})
-	//})
+	r.GET("/login", func(c *gin.Context) {
+		c.HTML(200, "front", nil)
+	})
+	r.GET("/404", func(c *gin.Context) {
+		c.HTML(200, "front", nil)
+	})
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(200, "front", nil)
+	})
 	v1 := r.Group("api/v1")
 	v1.Use(mid.JWTAuthMiddleware())
 	{
