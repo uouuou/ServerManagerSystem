@@ -75,7 +75,7 @@ func Install() {
 	//服务初始化
 	//服务的配置信息
 	cfg := &service.Config{
-		Name:        "serverManager_" + mid.Mode,
+		Name:        "serverManagerSystem_" + mid.Mode,
 		DisplayName: "ServerManager System",
 		Description: "This is a ServerManager System.",
 		Arguments:   []string{"-m", mid.Mode},

@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_NAME="ServerManager"
+PROJECT_NAME="ServerManagerSystem"
 BINARY="main"
 Version=$(date "+%Y%m%d%H%M%S")
 OUTPUT_DIR=output
