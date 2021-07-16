@@ -1,0 +1,2 @@
+# ServerManagerSystem
+一个基于Golang开发的远程服务管理系统，使用RPC远程调度，管理服务器进程保持、数据库远程调度等
