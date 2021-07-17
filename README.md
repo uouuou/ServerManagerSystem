@@ -39,6 +39,7 @@
   ./ServerManagerSystem_linux_amd64_upx  install
   service serverManagerSystem_server start
   journalctl -u serverManagerSystem_server.service -f
+  # 如果第一次启动无法打开WEB端请重新启动程序即可，WEB端口默认为：8000
   ```
   ```shelL
   # 客户端模式下
