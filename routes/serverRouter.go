@@ -43,19 +43,28 @@ func ServerRouter() {
 	r.SetHTMLTemplate(t)
 	// 为 multipart forms 设置较低的内存限制 (默认是 32 MiB)
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
-	sub, _ := fs.Sub(mid.FS, "web/static")
+	static, _ := fs.Sub(mid.FS, "web/static")
 	r.StaticFS("/upload", http.Dir(mid.Dir+"/upload"))
-	r.StaticFS("/static", http.FS(sub))
-	r.StaticFS("/favicon.ico", http.FS(mid.FS))
+	r.StaticFS("/static", http.FS(static))
+	r.GET("favicon.ico", func(c *gin.Context) {
+		file, _ := mid.FS.ReadFile("web/favicon.ico")
+		c.Data(
+			http.StatusOK,
+			"image/x-icon",
+			file,
+		)
+	})
 	r.GET("/login", func(c *gin.Context) {
 		c.HTML(200, "index.html", nil)
 	})
 	r.GET("/404", func(c *gin.Context) {
 		c.HTML(200, "index.html", nil)
 	})
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(200, "index.html", nil)
-	})
+	for _, list := range mid.MenuList {
+		r.GET(list.Url, func(c *gin.Context) {
+			c.HTML(200, "index.html", nil)
+		})
+	}
 	v1 := r.Group("api/v1")
 	v1.Use(mid.JWTAuthMiddleware())
 	{

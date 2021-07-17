@@ -27,6 +27,7 @@ var (
 	NatAuth      int             // 远程对客户端的NAT功能控制 1为开启 2为关闭
 	CronAuth     int             // 远程对客户端Cron的控制 1为开启 2为关闭
 	FS           embed.FS        // 文件打包后的路径
+	MenuList     []Menu          // 菜单router列表
 	AppRunStatus []AppRunStart
 )
 
