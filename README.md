@@ -21,7 +21,7 @@
    ```shelL
    wget https://golang.org/dl/go1.16.6.linux-amd64.tar.gz
    sudo tar -C /usr/local -xzf go1.16.6.linux-amd64.tar.gz
-   echo 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH'>> ~/.profile
+   echo 'export PATH=$PATH:/usr/local/go/bin'>> ~/.profile
    source ~/.profile
    go version
    ```
@@ -30,6 +30,8 @@
   ```shelL
   git clone https://github.com/uouuou/ServerManagerSystem.git
   apt install upx-ucl
+  cd ServerManagerSystem/
+  go mod vendor
   sh build.sh
   cd output
   chmod -R 755 ServerManagerSystem_x86_64_upx 
