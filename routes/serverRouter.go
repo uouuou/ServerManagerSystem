@@ -30,6 +30,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// createMyRender 引入静态WEB
 func createMyRender() multitemplate.Renderer {
 	p := multitemplate.NewRenderer()
 	p.AddFromFiles("front", "web/index.html")
