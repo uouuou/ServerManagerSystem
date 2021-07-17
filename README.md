@@ -21,7 +21,7 @@
    ```shelL
    wget https://golang.org/dl/go1.16.6.linux-amd64.tar.gz
    sudo tar -C /usr/local -xzf go1.16.6.linux-amd64.tar.gz
-   echo 'export PATH=$PATH:/usr/local/go/bin'>> 〜/ .profile
+   echo 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH'>> ~/.profile
    source ~/.profile
    go version
    ```
