@@ -18,6 +18,8 @@ import (
 	"github.com/uouuou/ServerManagerSystem/server/upload"
 	"github.com/uouuou/ServerManagerSystem/server/user"
 	"github.com/uouuou/ServerManagerSystem/util"
+	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -26,40 +28,33 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 )
-
-// createMyRender 引入静态WEB
-func createMyRender() multitemplate.Renderer {
-	p := multitemplate.NewRenderer()
-	p.AddFromFiles("front", "web/index.html")
-	return p
-}
 
 // ServerRouter 服务端路由
 func ServerRouter() {
 	gin.ForceConsoleColor()
 	r := gin.New()
-	r.HTMLRender = createMyRender()
 	r.NoRoute(mid.HandleNotFound)
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(mid.Cors())
+	t := template.Must(template.New("").ParseFS(mid.FS, "web/*.html"))
+	r.SetHTMLTemplate(t)
 	// 为 multipart forms 设置较低的内存限制 (默认是 32 MiB)
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
-	r.Static("/css", mid.Dir+"/web/css")
+	sub, _ := fs.Sub(mid.FS, "web/static")
 	r.StaticFS("/upload", http.Dir(mid.Dir+"/upload"))
-	r.Static("/static", mid.Dir+"/web/static")
-	r.StaticFile("/favicon.ico", mid.Dir+"/web/favicon.ico")
+	r.StaticFS("/static", http.FS(sub))
+	r.StaticFS("/favicon.ico", http.FS(mid.FS))
 	r.GET("/login", func(c *gin.Context) {
-		c.HTML(200, "front", nil)
+		c.HTML(200, "index.html", nil)
 	})
 	r.GET("/404", func(c *gin.Context) {
-		c.HTML(200, "front", nil)
+		c.HTML(200, "index.html", nil)
 	})
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(200, "front", nil)
+		c.HTML(200, "index.html", nil)
 	})
 	v1 := r.Group("api/v1")
 	v1.Use(mid.JWTAuthMiddleware())

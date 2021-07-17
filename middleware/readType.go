@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"embed"
 	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/hprose/hprose-golang/v3/rpc/plugins/push"
@@ -25,6 +26,7 @@ var (
 	MainName     string          // 主程序名称
 	NatAuth      int             // 远程对客户端的NAT功能控制 1为开启 2为关闭
 	CronAuth     int             // 远程对客户端Cron的控制 1为开启 2为关闭
+	FS           embed.FS        // 文件打包后的路径
 	AppRunStatus []AppRunStart
 )
 

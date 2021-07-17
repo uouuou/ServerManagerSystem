@@ -29,10 +29,11 @@
 - 编译并使用本程序
   ```shelL
   git clone https://github.com/uouuou/ServerManagerSystem.git
+  apt install upx-ucl
   sh build.sh
-  cp -r ./web ./output
   cd output
-  chemo -R 755 ServerManagerSystem_linux_amd64_upx 
+  chmod -R 755 ServerManagerSystem_x86_64_upx 
+  # 这里只是示意，具体你生成的文件取决于你的操作系统亲具体查看文件名称
   ./ServerManagerSystem_linux_amd64_upx  install
   service serverManagerSystem_server start
   journalctl -u serverManagerSystem_server.service -f

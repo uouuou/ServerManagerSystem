@@ -24,11 +24,11 @@ CGO_ENABLED=1 go build -a -installsuffix cgo -v -mod=vendor \
             -X 'github.com/uouuou/ServerManagerSystem/models.GitRevision=${GIT_REVISION}' \
             -X 'github.com/uouuou/ServerManagerSystem/models.GitBranch=${GIT_BRANCH}' \
             -X 'github.com/uouuou/ServerManagerSystem/models.GoVersion=${GO_VERSION}'" \
-  -o ${OUTPUT_DIR}/${PROJECT_NAME}_${SYS_VERSION} ${BINARY}.go
+  -o ${OUTPUT_DIR}/${PROJECT_NAME}_"${SYS_VERSION}" ${BINARY}.go
 
 #删除原有的UPX压缩包并创建新的压缩包
-rm -rf ${OUTPUT_DIR}/${PROJECT_NAME}_${SYS_VERSION}_upx
-upx -5 -o ${OUTPUT_DIR}/${PROJECT_NAME}_${SYS_VERSION}_upx ${OUTPUT_DIR}/${PROJECT_NAME}_${SYS_VERSION}
+rm -rf ${OUTPUT_DIR}/${PROJECT_NAME}_"${SYS_VERSION}"_upx
+upx -5 -o ${OUTPUT_DIR}/${PROJECT_NAME}_"${SYS_VERSION}"_upx ${OUTPUT_DIR}/${PROJECT_NAME}_"${SYS_VERSION}"
 
 # 执行结束后打印版本号
 echo "--------------------------"
