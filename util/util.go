@@ -254,17 +254,8 @@ func init() {
 	sqlDB.SetConnMaxLifetime(time.Hour * 2)
 	//连接池里面的连接最大空闲时长
 	sqlDB.SetConnMaxIdleTime(time.Hour)
-	go RouterInit()
 }
 
 func GetDB() *gorm.DB {
 	return DB
-}
-
-func RouterInit() {
-	var menu []mid.Menu
-	if err := DB.Model(&menu).Where("authority = 1 and deleted_at IS NULL").Find(&menu).Error; err != nil {
-		mid.Log().Error(err.Error())
-	}
-	mid.MenuList = menu
 }
