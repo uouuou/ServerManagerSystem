@@ -40,6 +40,7 @@
   service serverManagerSystem_server start
   journalctl -u serverManagerSystem_server.service -f
   # 如果第一次启动无法打开WEB端请重新启动程序即可，WEB端口默认为：8000
+  # 本程序使用了sqllite3所以需要gcc环境才能编译，请务必自行安装gcc
   ```
   ```shelL
   # 客户端模式下
