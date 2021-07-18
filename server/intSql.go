@@ -83,12 +83,3 @@ func IntSqlStart() {
 		mid.Log().Info("初始化数据库完毕......")
 	}
 }
-
-// RouterInit 为路由获取一个菜单信息
-func RouterInit() {
-	var menu []mid.Menu
-	if err := db.Model(&menu).Where("authority = 1 and deleted_at IS NULL").Find(&menu).Error; err != nil {
-		mid.Log().Error(err.Error())
-	}
-	mid.MenuList = menu
-}

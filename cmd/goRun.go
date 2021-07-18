@@ -55,7 +55,6 @@ func (p *Program) run() {
 		}()
 		//使用goroutine防止单独进程崩溃的情况下运行
 		mod.NewRoutine(con.IntSqlStart)    //启动时自动处理SqLite
-		mod.NewRoutine(con.RouterInit)     //启动时加载菜单薪资做路由使用
 		mod.NewRoutine(system.CollectTask) //统计程序启动后的网卡上下载情况
 		mod.NewRoutine(clash.ReadConfig)   //读取一个clash配置文件
 		//mod.NewRoutine(clash.Runs)       //启动一个clash
