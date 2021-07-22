@@ -89,19 +89,24 @@ func ServerInfo() *ResponseBody {
 	bootTime := t.Local().Format("2006-01-02 15:04:05")
 	netInfo, _ := net.Interfaces()
 	//检测clash版本号
-	infoClash, _ := mod.ExecCommandWithResult("clash -v")
-	clashVersion := strings.Fields(strings.TrimSpace(infoClash))
-	clashVersions = clashVersion[1]
+	//检测clash版本号
+	infoClash, err := mod.ExecCommandWithResult("clash -v")
+	if err == nil {
+		clashVersion := strings.Fields(strings.TrimSpace(infoClash))
+		clashVersions = clashVersion[1]
+	}
 	//检测unbound的安装
 	infoUnbound, err := mod.ExecCommandWithResult("unbound -v")
-	if err != nil {
+	if err == nil {
 		unboundVersion := strings.Fields(strings.TrimSpace(infoUnbound))
 		unboundVersions = unboundVersion[6]
 	}
 	//检测nft是否安装并输出版本号
-	info, _ := mod.ExecCommandWithResult("nft -v")
-	ntfVersion := strings.Fields(strings.TrimSpace(info))
-	nftVersions = ntfVersion[1]
+	info, err := mod.ExecCommandWithResult("nft -v")
+	if err == nil {
+		ntfVersion := strings.Fields(strings.TrimSpace(info))
+		nftVersions = ntfVersion[1]
+	}
 	ioSata, _ := disk.IOCounters()
 	responseBody.Data = map[string]interface{}{
 		"cpu":            cpuInfo,
