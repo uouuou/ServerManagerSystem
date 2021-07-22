@@ -5,14 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	mid "github.com/uouuou/ServerManagerSystem/middleware"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
 	"unicode/utf8"
 
 	"github.com/gorilla/websocket"
-	"github.com/mitchellh/go-homedir"
 	goSsh "golang.org/x/crypto/ssh"
 )
 
