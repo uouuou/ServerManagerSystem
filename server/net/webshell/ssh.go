@@ -275,17 +275,8 @@ var upGrader = websocket.Upgrader{
 	},
 }
 
-func publicKeyAuthFunc(kPath string) goSsh.AuthMethod {
-	keyPath, err := homedir.Expand(kPath)
-	if err != nil {
-		mid.Log().Errorf("find key's home dir failed %v", err)
-	}
-	key, err := ioutil.ReadFile(keyPath)
-	if err != nil {
-		mid.Log().Errorf("ssh key file read failed %v", err)
-	}
-	// Create the Signer for this private key.
-	signer, err := goSsh.ParsePrivateKey(key)
+func publicKeyAuthFunc(key string) goSsh.AuthMethod {
+	signer, err := goSsh.ParsePrivateKey([]byte(key))
 	if err != nil {
 		mid.Log().Errorf("ssh key signer failed %v", err)
 	}
