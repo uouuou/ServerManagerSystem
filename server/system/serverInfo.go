@@ -93,9 +93,11 @@ func ServerInfo() *ResponseBody {
 	clashVersion := strings.Fields(strings.TrimSpace(infoClash))
 	clashVersions = clashVersion[1]
 	//检测unbound的安装
-	infoUnbound, _ := mod.ExecCommandWithResult("unbound -v")
-	unboundVersion := strings.Fields(strings.TrimSpace(infoUnbound))
-	unboundVersions = unboundVersion[6]
+	infoUnbound, err := mod.ExecCommandWithResult("unbound -v")
+	if err != nil {
+		unboundVersion := strings.Fields(strings.TrimSpace(infoUnbound))
+		unboundVersions = unboundVersion[6]
+	}
 	//检测nft是否安装并输出版本号
 	info, _ := mod.ExecCommandWithResult("nft -v")
 	ntfVersion := strings.Fields(strings.TrimSpace(info))

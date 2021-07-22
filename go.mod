@@ -12,7 +12,7 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-contrib/multitemplate v0.0.0-20210428235909-8a2f6dd269a0
+	github.com/gin-contrib/multitemplate v0.0.0-20210428235909-8a2f6dd269a0 // indirect
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-playground/validator/v10 v10.7.0 // indirect
@@ -28,6 +28,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v1.14.7 // indirect
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/phachon/go-logger v0.0.0-20191215032019-86e4227f71ea
 	github.com/pkg/errors v0.9.1 // indirect

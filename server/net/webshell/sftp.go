@@ -3,6 +3,7 @@ package webshell
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	goSftp "github.com/pkg/sftp"
@@ -30,20 +31,25 @@ type File struct {
 }
 
 type SftpLoginModel struct {
-	user   string
-	passwd string
-	addr   string
+	user    string
+	passwd  string
+	addr    string
+	SshType int
 }
 
 // SftpCreate 创建一个sftp连接
 func SftpCreate(login SftpLoginModel) (*goSftp.Client, error) {
-	auth := make([]goSsh.AuthMethod, 0)
-	auth = append(auth, goSsh.Password(login.passwd))
 	config := goSsh.ClientConfig{
 		User:            login.user,
-		Auth:            auth,
-		Timeout:         10 * time.Second,
+		Timeout:         2 * time.Second,
 		HostKeyCallback: goSsh.InsecureIgnoreHostKey(),
+	}
+	if login.SshType == 1 {
+		config.Auth = []goSsh.AuthMethod{goSsh.Password(login.passwd)}
+	} else if login.SshType == 2 {
+		config.Auth = []goSsh.AuthMethod{publicKeyAuthFunc(login.passwd)}
+	} else {
+		return nil, errors.New("密钥不存在！")
 	}
 	conn, err := goSsh.Dial("tcp", login.addr, &config)
 	if err != nil {
@@ -458,6 +464,7 @@ func getSftpServerInfo(sid string) (m SftpLoginModel) {
 		m.addr = serverInfo.ServerAddress
 		m.user = serverInfo.UserName
 		m.passwd = serverInfo.Password
+		m.SshType = serverInfo.SshType
 	}
 	return
 }

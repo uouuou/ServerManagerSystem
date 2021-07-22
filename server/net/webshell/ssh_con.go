@@ -5,7 +5,6 @@ import (
 	mid "github.com/uouuou/ServerManagerSystem/middleware"
 	mod "github.com/uouuou/ServerManagerSystem/models"
 	"github.com/uouuou/ServerManagerSystem/util"
-	"net/http"
 	"strconv"
 )
 
@@ -17,6 +16,7 @@ type ServerInfo struct {
 	Memo          string `gorm:"column:memo;size:128;" json:"memo" form:"memo"`                                        // 备注
 	ServerAddress string `gorm:"column:server_address;size:128;not null;" json:"server_address" form:"server_address"` // 服务器地址
 	UserName      string `gorm:"column:user_name;size:128;not null;" json:"user_name" form:"user_name"`                // 登录用户名
+	SshType       int    `json:"ssh_type" gorm:"column:ssh_type;default:1" form:"ssh_type"`                            // 鉴权方式，默认1是password 2是key
 	Password      string `gorm:"column:password;type:char(128);not null;" json:"password" form:"password"`             // 登录密码
 	AliasName     string `gorm:"column:alias_name;size:64;" json:"alias_name" form:"alias_name"`                       // 服务器别名
 	UpdateUser    string `json:"update_user" gorm:"comment:'更新人'"`                                                     // 更新人
@@ -120,18 +120,6 @@ func (ServerInfo) DelShell(c *gin.Context) {
 	}
 }
 
-// Xterm 启动Xterm连接ssh
-func (ServerInfo) Xterm(c *gin.Context) {
-	sid, _ := c.GetQuery("sid")
-	if getServerInfo(sid, 100, 50).Addr == "" {
-		mid.DataErr(c, nil, "没有该设备")
-	} else {
-		c.HTML(http.StatusOK, "xterm.html", gin.H{
-			"sid": sid,
-		})
-	}
-}
-
 // Ws 开启一个ws传输shell数据
 func (ServerInfo) Ws(c *gin.Context) {
 	WebSocketHandler(c.Writer, c.Request, checkUserToken, getServerInfo)
@@ -158,6 +146,7 @@ func getServerInfo(sid string, cols int, rows int) (m SshLoginModel) {
 		m.Addr = serverInfo.ServerAddress
 		m.UserName = serverInfo.UserName
 		m.Pwd = serverInfo.Password
+		m.SshType = serverInfo.SshType
 	}
 	return
 }

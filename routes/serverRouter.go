@@ -351,7 +351,6 @@ func ServerRouter() {
 		notAuth.GET("gettoken", con.GetToken)
 		//注册一个webSsh相关的接口
 		serverInfo := webshell.ServerInfo{}
-		notAuth.GET("xterm", serverInfo.Xterm)
 		//ssh接口
 		notAuth.GET("ws", serverInfo.Ws)
 		//日志动态显示

@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	mid "github.com/uouuou/ServerManagerSystem/middleware"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
 	"unicode/utf8"
 
 	"github.com/gorilla/websocket"
+	"github.com/mitchellh/go-homedir"
 	goSsh "golang.org/x/crypto/ssh"
 )
 
@@ -25,6 +28,7 @@ type ptyRequestMsg struct {
 type SshLoginModel struct {
 	Addr     string
 	UserName string
+	SshType  int
 	Pwd      string
 	PemKey   string
 	PtyCols  uint32
@@ -37,15 +41,24 @@ type SshLoginModel struct {
 
 // 创建一个ssh连接
 func sshConnect(login SshLoginModel) (client *goSsh.Client, ch goSsh.Channel, session *goSsh.Session, err error) {
+	//创建ssh登陆配置
 	config := &goSsh.ClientConfig{}
 	config.SetDefaults()
+	config.Timeout = time.Second * 2
 	config.User = login.UserName
 	if login.Pwd == "" {
 		return
 	} else {
-		config.Auth = []goSsh.AuthMethod{goSsh.Password(login.Pwd)}
+		if login.SshType == 1 {
+			config.Auth = []goSsh.AuthMethod{goSsh.Password(login.Pwd)}
+		} else if login.SshType == 2 {
+			config.Auth = []goSsh.AuthMethod{publicKeyAuthFunc(login.Pwd)}
+		} else {
+			return
+		}
 	}
 	config.HostKeyCallback = func(hostname string, remote net.Addr, key goSsh.PublicKey) error { return nil }
+	//dial 获取ssh client
 	client, err = goSsh.Dial("tcp", login.Addr, config)
 	if err != nil {
 		return
@@ -103,6 +116,7 @@ func sshConnect(login SshLoginModel) (client *goSsh.Client, ch goSsh.Channel, se
 		return
 	}
 	ch = channel
+	//创建ssh-session
 	session, _ = client.NewSession()
 
 	return
@@ -259,4 +273,21 @@ var upGrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
+}
+
+func publicKeyAuthFunc(kPath string) goSsh.AuthMethod {
+	keyPath, err := homedir.Expand(kPath)
+	if err != nil {
+		mid.Log().Errorf("find key's home dir failed %v", err)
+	}
+	key, err := ioutil.ReadFile(keyPath)
+	if err != nil {
+		mid.Log().Errorf("ssh key file read failed %v", err)
+	}
+	// Create the Signer for this private key.
+	signer, err := goSsh.ParsePrivateKey(key)
+	if err != nil {
+		mid.Log().Errorf("ssh key signer failed %v", err)
+	}
+	return goSsh.PublicKeys(signer)
 }
