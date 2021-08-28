@@ -241,9 +241,9 @@ func SftpDownload(c *gin.Context) {
 			mid.ClientErr(c, err, "文件读取异常")
 			return
 		}
-
+		nameString:=strings.Split(f.Name(),"/")
 		extraHeaders := map[string]string{
-			"Content-Disposition": fmt.Sprintf(`attachment; filename="%s"`, f.Name()),
+			"Content-Disposition": fmt.Sprintf(`attachment; filename="%s"`, nameString[len(nameString)-1]),
 		}
 		c.DataFromReader(http.StatusOK, fi.Size(), "application/octet-stream", f, extraHeaders)
 		return

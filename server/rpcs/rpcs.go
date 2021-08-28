@@ -119,9 +119,9 @@ func init() {
 	Caller = reverse.NewCaller(service.Service)
 	mid.Caller = Caller
 	// 请求客户端的总体消耗时间超过改时间记为超时
-	//Caller.Timeout = time.Second * 30
+	Caller.Timeout = time.Second * 10
 	// 客户端和服务端的整体通信超时时间
-	//Caller.HeartBeat = time.Second * 5
+	Caller.HeartBeat = time.Second * 5
 	socketHandler.OnAccept = func(c net.Conn) net.Conn {
 		mid.Log().Info(c.RemoteAddr().String() + " -> " + c.LocalAddr().String() + " connected")
 		return c
