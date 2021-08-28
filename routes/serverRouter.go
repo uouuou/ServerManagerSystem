@@ -65,6 +65,12 @@ func ServerRouter() {
 			c.HTML(200, "index.html", nil)
 		})
 	}
+	r.GET("/net/sftp", func(c *gin.Context) {
+		c.HTML(200, "index.html", nil)
+	})
+	r.GET("/net/xterm", func(c *gin.Context) {
+		c.HTML(200, "index.html", nil)
+	})
 	v1 := r.Group("api/v1")
 	v1.Use(mid.JWTAuthMiddleware())
 	{
