@@ -72,7 +72,7 @@ func ClientSql(sqlConfig SqlConfig) (DB *gorm.DB) {
 				if os.IsNotExist(err) {
 					err := os.MkdirAll(configDir, os.ModePerm)
 					if err != nil {
-						mid.Log().Info(fmt.Sprintf("err:%v", err))
+						mid.Log.Info(fmt.Sprintf("err:%v", err))
 					}
 					return
 				}
@@ -81,7 +81,7 @@ func ClientSql(sqlConfig SqlConfig) (DB *gorm.DB) {
 			// 创建一个数据库文件
 			file, err := os.Create(dsn)
 			if err != nil {
-				mid.Log().Info(fmt.Sprintf("err:%v", err))
+				mid.Log.Info(fmt.Sprintf("err:%v", err))
 			}
 			defer func(file *os.File) {
 				_ = file.Close()
@@ -95,14 +95,14 @@ func ClientSql(sqlConfig SqlConfig) (DB *gorm.DB) {
 	}
 	if DB != nil {
 		if sqlErr != nil {
-			mid.Log().Error(fmt.Sprintf("SqlConfig connect error %v\n", sqlErr))
+			mid.Log.Error(fmt.Sprintf("SqlConfig connect error %v\n", sqlErr))
 		}
 		if DB.Error != nil {
-			mid.Log().Error(fmt.Sprintf("database error %v\n", DB.Error))
+			mid.Log.Error(fmt.Sprintf("database error %v\n", DB.Error))
 		}
 		sqlDB, err := DB.DB()
 		if err != nil {
-			mid.Log().Error(fmt.Sprintf("sql err:%v\n", err))
+			mid.Log.Error(fmt.Sprintf("sql err:%v\n", err))
 		}
 		// 连接池最多同时打开的连接数
 		sqlDB.SetMaxOpenConns(200)
@@ -127,7 +127,7 @@ func SpecifySqlReverse(runSql RunSql) map[string]interface{} {
 	}
 	sqlDb, err := db.DB()
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("本地SQL准备异常:%v\n", err))
+		mid.Log.Error(fmt.Sprintf("本地SQL准备异常:%v\n", err))
 	}
 	defer func(sqlDb *sql.DB) {
 		err := sqlDb.Close()
@@ -137,12 +137,12 @@ func SpecifySqlReverse(runSql RunSql) map[string]interface{} {
 	}(sqlDb)
 	sqlRows, err := db.Debug().Raw(runSql.SqlRaw).Rows()
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + ":数据库执行异常 " + err.Error())
+		mid.Log.Error(mid.RunFuncName() + ":数据库执行异常 " + err.Error())
 		return mid.ResErr(err, "数据库执行异常")
 	}
 	cols, err := sqlRows.Columns()
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + ":数据读取数量异常 " + err.Error())
+		mid.Log.Error(mid.RunFuncName() + ":数据读取数量异常 " + err.Error())
 		return mid.ResErr(err, "数据读取数量异常")
 	}
 	defer func(sqlRows *sql.Rows) {
@@ -163,7 +163,7 @@ func SpecifySqlReverse(runSql RunSql) map[string]interface{} {
 
 		err := sqlRows.Scan(rows...)
 		if err != nil {
-			mid.Log().Error(mid.RunFuncName() + ":数据匹配异常 " + err.Error())
+			mid.Log.Error(mid.RunFuncName() + ":数据匹配异常 " + err.Error())
 			return mid.ResErr(err, "数据匹配异常")
 		}
 

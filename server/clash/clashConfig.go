@@ -135,7 +135,7 @@ func ReadConfig() {
 	}
 	err = yaml.Unmarshal(config, &rawConfig)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	if rawConfig.BindAddress == "" {
 		rawConfig.BindAddress = "0.0.0.0"

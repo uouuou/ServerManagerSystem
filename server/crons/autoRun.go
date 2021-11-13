@@ -25,7 +25,7 @@ func AutoRunCron() {
 				}
 				_, _, err := m.AddFun(myCron)
 				if err != nil {
-					mid.Log().Errorf("启动脚本异常：%v", err.Error())
+					mid.Log.Errorf("启动脚本异常：%v", err.Error())
 				}
 			}
 		}
@@ -45,7 +45,7 @@ func AutoRunCron() {
 				}
 				_, _, err := m.AddFun(myCron)
 				if err != nil {
-					mid.Log().Errorf("启动脚本异常：%v", err.Error())
+					mid.Log.Errorf("启动脚本异常：%v", err.Error())
 				}
 			}
 		}
@@ -60,11 +60,11 @@ func AutoRunCron() {
 				}
 			}
 			m.RemoveFun(list)
-			mid.Log().Infof("Cron在线更新成功Entries:%v", RunCron.Entries())
+			mid.Log.Infof("Cron在线更新成功Entries:%v", RunCron.Entries())
 		}
 	}
 	if len(crons) > 0 && len(oldCronList) != len(CronRunLists) {
 		m.Start()
-		mid.Log().Infof("Cron启动成功Entries:%v", RunCron.Entries())
+		mid.Log.Infof("Cron启动成功Entries:%v", RunCron.Entries())
 	}
 }

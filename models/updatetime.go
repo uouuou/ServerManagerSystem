@@ -17,7 +17,7 @@ func UpdateSystemDate(dateTime string) bool {
 			_, err1 := gproc.ShellExec(`date  ` + gstr.Split(dateTime, " ")[0])
 			_, err2 := gproc.ShellExec(`time  ` + gstr.Split(dateTime, " ")[1])
 			if err1 != nil && err2 != nil {
-				mid.Log().Info("更新系统时间错误:请用管理员身份启动程序!")
+				mid.Log.Info("更新系统时间错误:请用管理员身份启动程序!")
 				return false
 			}
 			return true
@@ -26,7 +26,7 @@ func UpdateSystemDate(dateTime string) bool {
 		{
 			_, err1 := gproc.ShellExec(`date -s  "` + dateTime + `"`)
 			if err1 != nil {
-				mid.Log().Info("更新系统时间错误:" + err1.Error())
+				mid.Log.Info("更新系统时间错误:" + err1.Error())
 				return false
 			}
 			return true
@@ -35,7 +35,7 @@ func UpdateSystemDate(dateTime string) bool {
 		{
 			_, err1 := gproc.ShellExec(`date -s  "` + dateTime + `"`)
 			if err1 != nil {
-				mid.Log().Info("更新系统时间错误:" + err1.Error())
+				mid.Log.Info("更新系统时间错误:" + err1.Error())
 				return false
 			}
 			return true

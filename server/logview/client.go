@@ -68,7 +68,7 @@ func (c *Client) read() {
 		req := Request{}
 		err = json.Unmarshal(message, &req)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 			return
 		}
 		message = bytes.TrimSpace(message)
@@ -164,7 +164,7 @@ func (c *Client) write(ctx context.Context) {
 		}
 		marshal, err := json.Marshal(msg)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 			return
 		}
 		err = c.conn.WriteMessage(messageType, marshal)
@@ -182,7 +182,7 @@ func (c *Client) write(ctx context.Context) {
 func serveWs(w http.ResponseWriter, r *http.Request, logFile string, tailOptions []string) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 		return
 	}
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -234,7 +234,7 @@ func WriteMessage(line string, msgType int) (send []byte, err error) {
 	}
 	send, err = json.Marshal(msg)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 		return send, err
 	}
 	return send, nil

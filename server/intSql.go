@@ -39,7 +39,7 @@ func IntSqlStart() {
 		roles.RoleName = "超级管理员"
 		roles.UpdateUser = "系统"
 		if err := db.Create(&roles).Error; err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 	}
 	if db.Find(&conf).RowsAffected <= 0 {
@@ -80,6 +80,6 @@ func IntSqlStart() {
 		db.Exec(menuAdd + " (8, '菜单管理', 8, '/setting/menu', 'el-icon-orange', 4, 1, 2, '系统');")
 		db.Exec(menuAdd + " (8, '网络设置', 8, '/setting/net', 'el-icon-table-lamp', 5, 2, 2, '系统');")
 		db.Exec(menuAdd + " (8, '系统设置', 8, '/setting/system', 'el-icon-shopping-bag-1', 6, 2, 2, '系统');")
-		mid.Log().Info("初始化数据库完毕......")
+		mid.Log.Info("初始化数据库完毕......")
 	}
 }

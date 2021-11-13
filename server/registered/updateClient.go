@@ -9,7 +9,7 @@ import (
 func PushUpdate() (up mod.Update, err error) {
 	var updates mod.Update
 	if err = db.Model(&updates).Last(&up).Error; err != nil {
-		mid.Log().Error("获取更新数据失败")
+		mid.Log.Error("获取更新数据失败")
 		return
 	}
 	return

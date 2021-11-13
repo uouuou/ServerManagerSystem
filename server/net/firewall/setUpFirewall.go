@@ -80,7 +80,7 @@ func (Firewall) FirewallList(c *gin.Context) {
 	)
 	pages, Db := mid.GetPages(db, c.Query("page"), c.Query("page_size"), &fire)
 	if err := Db.Where("remarks != ? and deleted_at IS NULL", "").Find(&fire).Error; err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	for _, s := range fire {
 		if s.Action == 1 {
@@ -114,7 +114,7 @@ func (Firewall) DelFirewall(c *gin.Context) {
 	)
 	err := c.ShouldBind(&fire)
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("err:%v", err))
+		mid.Log.Error(fmt.Sprintf("err:%v", err))
 		mid.ClientErr(c, err, "格式错误")
 		return
 	}

@@ -22,6 +22,7 @@ func ClientRouter() {
 	r.NoRoute(mid.HandleNotFound)
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.Use(mid.GinLog())
 	r.Use(mid.Cors())
 	v1 := r.Group("api/v1")
 	v1.Use(mid.AuthAll())

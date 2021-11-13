@@ -42,7 +42,7 @@ func SendServerJan(msg string) {
 	urls := fmt.Sprintf("https://sc.ftqq.com/yourkey.send?text=%s&desp=%s", text, url.QueryEscape(msg))
 	res, err := http.Post(urls, "application/json; charset=UTF-8", strings.NewReader(""))
 	if nil != err {
-		mid.Log().Error(fmt.Sprintf("http post err:%v", err))
+		mid.Log.Error(fmt.Sprintf("http post err:%v", err))
 		SendMail(err.Error())
 		return
 	}
@@ -53,21 +53,21 @@ func SendServerJan(msg string) {
 	// return status
 	if http.StatusOK != res.StatusCode {
 		msg := fmt.Sprintf("WebService SoapOa request fail, status: %d\n\n", res.StatusCode)
-		mid.Log().Warning(msg)
+		mid.Log.Warning(msg)
 		return
 	}
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
 		msg := fmt.Sprintf("Io ReadAll err:%v\n", err)
-		mid.Log().Warning(msg)
+		mid.Log.Warning(msg)
 		return
 	}
 	var result result
 	err = json.Unmarshal(data, &result)
 	if err != nil {
 		msg := fmt.Sprintf("err:%v\n", err)
-		mid.Log().Warning(msg)
+		mid.Log.Warning(msg)
 	}
 	log.Print(result.ErrMsg)
 }

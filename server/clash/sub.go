@@ -36,7 +36,7 @@ func (Sub) GetSubList(c *gin.Context) {
 	)
 	pages, Db := mid.GetPages(db, c.Query("page"), c.Query("page_size"), &sub)
 	if err := Db.Where("sub_name != ? and deleted_at IS NULL", "").Find(&sub).Error; err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	mid.DataPageOk(c, pages, sub, "success")
 }

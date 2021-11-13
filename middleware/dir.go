@@ -28,13 +28,13 @@ func init() {
 	//创建日志文件夹
 	if !FileExist(Dir + "/log") {
 		if err := os.MkdirAll(Dir+"/log", 0755); err != nil {
-			Log().Error(RunFuncName() + ":创建文件夹异常 " + err.Error())
+			Log.Error(RunFuncName() + ":创建文件夹异常 " + err.Error())
 		}
 	}
 	//创建配置文件夹
 	if !FileExist(Dir + "/config") {
 		if err := os.MkdirAll(Dir+"/config", 0755); err != nil {
-			Log().Error(RunFuncName() + ":创建文件夹异常 " + err.Error())
+			Log.Error(RunFuncName() + ":创建文件夹异常 " + err.Error())
 		}
 	}
 }
@@ -43,7 +43,7 @@ func init() {
 func GetCurrentDirectory() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		Log().Error(err.Error())
+		Log.Error(err.Error())
 	}
 	return strings.Replace(dir, "\\", "/", -1)
 }
@@ -52,7 +52,7 @@ func GetCurrentDirectory() string {
 func GetMainName() string {
 	path, err := os.Executable()
 	if err != nil {
-		Log().Error(RunFuncName() + "：获取目录出现错误 " + err.Error())
+		Log.Error(RunFuncName() + "：获取目录出现错误 " + err.Error())
 	}
 	fileName := filepath.Base(path)
 	return fileName

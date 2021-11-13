@@ -53,7 +53,7 @@ func SetFrpConfig(c *gin.Context) {
 	var frps frp
 	err := c.ShouldBind(&frps)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 		mid.ClientErr(c, err, "格式错误")
 		return
 	}
@@ -95,12 +95,12 @@ func FrpConfig(start string) []byte {
 		}
 		err = cfg.SaveTo(mid.Dir + "/config/frp/" + name)
 		if err != nil {
-			mid.Log().Error(fmt.Sprintf("err:%v", err))
+			mid.Log.Error(fmt.Sprintf("err:%v", err))
 		}
 	}
 	config, err := os.ReadFile(mid.Dir + "/config/frp/" + name)
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("err:%v", err))
+		mid.Log.Error(fmt.Sprintf("err:%v", err))
 	}
 	return config
 }
@@ -116,13 +116,13 @@ func UpdateFrp(start string) bool {
 		info = "Info: Frp New Install"
 	}
 	if frp.BrowserDownloadUrl == "" {
-		mid.Log().Info(mid.RunFuncName() + ":Frp接口请求异常")
+		mid.Log.Info(mid.RunFuncName() + ":Frp接口请求异常")
 		return false
 	}
 	if "v"+info != frp.TagName {
 		url := fmt.Sprintf("%v%v", "https://mirror.ghproxy.com/", frp.BrowserDownloadUrl)
 		if con.Down(url, frp.Path) {
-			mid.Log().Info("Frp " + frp.TagName + " 下载成功：" + frp.PathName)
+			mid.Log.Info("Frp " + frp.TagName + " 下载成功：" + frp.PathName)
 		}
 		pid := mod.ForPid("frp")
 		pids := strings.Split(pid, "\n")
@@ -135,26 +135,26 @@ func UpdateFrp(start string) bool {
 			}
 			err := mod.ExecCommand("tar -zvxf " + mid.Dir + "/config/frp.gz -C " + mid.Dir + "/config/frp")
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 			if start == "client" {
 				err = mod.ExecCommand("cd " + mid.Dir + "/config/frp/frp_* && mv frpc ../")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 				err = mod.ExecCommand("rm -rf " + mid.Dir + "/config/frp/frp_*")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 			}
 			if start == "server" {
 				err = mod.ExecCommand("cd " + mid.Dir + "/config/frp/frp_* && mv frps ../")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 				err = mod.ExecCommand("rm -rf " + mid.Dir + "/config/frp/frp_*")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 			}
 		} else {
@@ -173,32 +173,32 @@ func UpdateFrp(start string) bool {
 			}
 			err := mod.ExecCommand("tar -zvxf " + mid.Dir + "/config/frp.gz -C " + mid.Dir + "/config/frp")
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 			if start == "client" {
 				err = mod.ExecCommand("cd " + mid.Dir + "/config/frp/frp_* && mv frpc ../")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 				err = mod.ExecCommand("rm -rf " + mid.Dir + "/config/frp/frp_*")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 			}
 			if start == "server" {
 				err = mod.ExecCommand("cd " + mid.Dir + "/config/frp/frp_* && mv frps ../")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 				err = mod.ExecCommand("rm -rf " + mid.Dir + "/config/frp/frp_*")
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 			}
 		}
 		err := mod.ExecCommand("chmod -R 755 " + mid.Dir + "/config/frp")
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		return true
 	} else {
@@ -216,7 +216,7 @@ func GetFrpNew(start string) (Frp Frp) {
 	frpInfo := con.GetApi(url, nil)
 	err := json.Unmarshal(frpInfo, &gitApi)
 	if err != nil {
-		mid.Log().Error("FRP线上接口请求受限：" + err.Error())
+		mid.Log.Error("FRP线上接口请求受限：" + err.Error())
 		return
 	}
 	architecture, system := mid.GetArchitecture()

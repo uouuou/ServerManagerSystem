@@ -51,7 +51,7 @@ func (p *Program) run() {
 		//初始化操作系统程序
 		go func() {
 			m := EnvTesting()
-			mid.Log().Info(convert.ToString(m["unbound"] + "  " + m["clash"] + "  " + m["nftables"]))
+			mid.Log.Info(convert.ToString(m["unbound"] + "  " + m["clash"] + "  " + m["nftables"]))
 		}()
 		//使用goroutine防止单独进程崩溃的情况下运行
 		mod.NewRoutine(con.IntSqlStart)    //启动时自动处理SqLite

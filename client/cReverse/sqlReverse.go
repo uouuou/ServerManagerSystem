@@ -13,12 +13,12 @@ func SqlReverse(rawSql string) map[string]interface{} {
 	db := util.DB
 	sqlRows, err := db.Debug().Raw(rawSql).Rows()
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + ":数据库执行异常 " + err.Error())
+		mid.Log.Error(mid.RunFuncName() + ":数据库执行异常 " + err.Error())
 		return mid.ResErr(err, "数据库执行异常")
 	}
 	cols, err := sqlRows.Columns()
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + ":数据读取数量异常 " + err.Error())
+		mid.Log.Error(mid.RunFuncName() + ":数据读取数量异常 " + err.Error())
 		return mid.ResErr(err, "数据读取数量异常")
 	}
 	defer func(sqlRows *sql.Rows) {
@@ -39,7 +39,7 @@ func SqlReverse(rawSql string) map[string]interface{} {
 
 		err := sqlRows.Scan(rows...)
 		if err != nil {
-			mid.Log().Error(mid.RunFuncName() + ":数据匹配异常 " + err.Error())
+			mid.Log.Error(mid.RunFuncName() + ":数据匹配异常 " + err.Error())
 			return mid.ResErr(err, "数据匹配异常")
 		}
 

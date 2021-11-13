@@ -29,7 +29,7 @@ func (ServerInfo) GetShellList(c *gin.Context) {
 	)
 	pages, Db := mid.GetPages(db, c.Query("page"), c.Query("page_size"), &serverInfo)
 	if err := Db.Where("server_address != ? and deleted_at IS NULL", "").Find(&serverInfo).Error; err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	mid.DataPageOk(c, pages, serverInfo, "success")
 }

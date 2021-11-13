@@ -81,16 +81,16 @@ func InstallPack(name string) {
 		if CheckCommandExists("yum") {
 			err := ExecCommand("yum install -y " + name)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 		} else if CheckCommandExists("apt-get") {
 			err := ExecCommand("apt-get update")
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 			err = ExecCommand("apt-get install -y " + name)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 		}
 	}
@@ -101,31 +101,31 @@ func OpenPort(port int) {
 	if CheckCommandExists("firewall-cmd") {
 		err := ExecCommand(fmt.Sprintf("firewall-cmd --zone=public --add-port=%d/tcp --add-port=%d/udp --permanent >/dev/null 2>&1", port, port))
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		err = ExecCommand("firewall-cmd --reload >/dev/null 2>&1")
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 	} else {
 		withResult, err := ExecCommandWithResult(fmt.Sprintf(`iptables -nvL --line-number|grep -w "%d"`, port))
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		if len(withResult) > 0 {
 			return
 		}
 		err = ExecCommand(fmt.Sprintf("iptables -I INPUT -p tcp --dport %d -j ACCEPT", port))
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		err = ExecCommand(fmt.Sprintf("iptables -I INPUT -p udp --dport %d -j ACCEPT", port))
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		err = ExecCommand(fmt.Sprintf("iptables -I OUTPUT -p udp --sport %d -j ACCEPT", port))
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		err = ExecCommand(fmt.Sprintf("iptables -I OUTPUT -p tcp --sport %d -j ACCEPT", port))
 	}
@@ -135,7 +135,7 @@ func OpenPort(port int) {
 func ForPid(name string) (pid string) {
 	pid, err := ExecCommandWithResult(fmt.Sprintf("ps aux|grep '%v'|grep -v \"grep\"|awk '{print $2}'", name))
 	if err != nil {
-		mid.Log().Error("获取PID异常")
+		mid.Log.Error("获取PID异常")
 		return
 	}
 	pid = strings.Replace(pid, "\n", "", -1)
@@ -146,7 +146,7 @@ func ForPid(name string) (pid string) {
 func ForPids(name string) (pids []string) {
 	pid, err := ExecCommandWithResult(fmt.Sprintf("ps aux|grep '%v'|grep -v \"grep\"|awk '{print $2}'", name))
 	if err != nil {
-		mid.Log().Error("获取PID异常")
+		mid.Log.Error("获取PID异常")
 		return
 	}
 	pid = strings.Replace(pid, "\n", ",", -1)
@@ -158,7 +158,7 @@ func ForPids(name string) (pids []string) {
 func ForPidString(name string) (pid string) {
 	pid, err := ExecCommandWithResult(fmt.Sprintf("ps aux|grep '%v'|grep -v \"grep\"|awk '{print $2}'", name))
 	if err != nil {
-		mid.Log().Error("获取PID异常")
+		mid.Log.Error("获取PID异常")
 		return
 	}
 	pid = strings.Replace(pid, "\n", ",", -1)
@@ -214,7 +214,7 @@ func runInLinux(cmd string) (string, error) {
 func GetCurrentDirectory() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	return strings.Replace(dir, "\\", "/", -1)
 }

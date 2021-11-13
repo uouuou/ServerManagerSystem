@@ -14,15 +14,15 @@ func GetClashInfo(c *gin.Context) {
 	var rawConfig RawConfig
 	config, err := os.ReadFile(mid.Dir + "/config/configClash.yaml")
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	toJSON, err := yaml.YAMLToJSON(config)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	err = json.Unmarshal(toJSON, &rawConfig)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	resultBody := mid.ResultBody{
 		Code:    2000,

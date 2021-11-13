@@ -26,7 +26,7 @@ func RunWebShell(webShellPath string) {
 	}
 	resp, err := http.Get(webShellPath)
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("%v err: %v", mid.RunFuncName(), err))
+		mid.Log.Error(fmt.Sprintf("%v err: %v", mid.RunFuncName(), err))
 	}
 	defer resp.Body.Close()
 	installShell, err := io.ReadAll(resp.Body)
@@ -44,7 +44,7 @@ func ExecCommand(command string) error {
 	stderr, _ := cmd.StderrPipe()
 
 	if err := cmd.Start(); err != nil {
-		mid.Log().Error(fmt.Sprintf("%v Error:The command is err: %v", mid.RunFuncName(), err))
+		mid.Log.Error(fmt.Sprintf("%v Error:The command is err: %v", mid.RunFuncName(), err))
 		return err
 	}
 	ch := make(chan string, 100)
@@ -66,7 +66,7 @@ func ExecCommand(command string) error {
 	go func() {
 		err = cmd.Wait()
 		if err != nil && !strings.Contains(err.Error(), "exit status") {
-			mid.Log().Error(fmt.Sprintf("%v wait:%v", mid.RunFuncName(), err))
+			mid.Log.Error(fmt.Sprintf("%v wait:%v", mid.RunFuncName(), err))
 		}
 		close(ch)
 	}()
@@ -80,7 +80,7 @@ func ExecCommand(command string) error {
 func ExecCommandWithResult(command string) (res string, err error) {
 	out, err := exec.Command("bash", "-c", command).CombinedOutput()
 	if err != nil && !strings.Contains(err.Error(), "exit status") {
-		mid.Log().Error(fmt.Sprintf("%v Command:%v err:%v", mid.RunFuncName(), command, err))
+		mid.Log.Error(fmt.Sprintf("%v Command:%v err:%v", mid.RunFuncName(), command, err))
 		return string(out), err
 	}
 	return string(out), err

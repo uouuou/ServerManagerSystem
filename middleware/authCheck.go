@@ -44,7 +44,7 @@ func authCheck() gin.HandlerFunc {
 		var treeList []TreeList
 		err := json.Unmarshal(menu, &treeList)
 		if err != nil {
-			Log().Error(err.Error())
+			Log.Error(err.Error())
 			c.Abort()
 		}
 		url := strings.Split(c.Request.URL.Path, "/")

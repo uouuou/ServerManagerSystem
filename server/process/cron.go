@@ -56,7 +56,7 @@ func AutoRun() {
 								mid.AppRunStatus[i].Num++
 							}
 						}
-						mid.Log().Error(pList.Name + ":没能正常启动")
+						mid.Log.Error(pList.Name + ":没能正常启动")
 						continue PGo
 					} else {
 						pNow.Pid = mod.ForPidString(pList.RunCmd)
@@ -68,7 +68,7 @@ func AutoRun() {
 									mid.AppRunStatus[i].Num++
 								}
 							}
-							mid.Log().Error(pList.Name + ":没能正常启动")
+							mid.Log.Error(pList.Name + ":没能正常启动")
 							continue PGo
 						} else {
 							db.Model(&p).Where("id = ? and deleted_at IS NULL", pList.ID).Updates(&pNow)
@@ -79,7 +79,7 @@ func AutoRun() {
 									mid.AppRunStatus[i].Num++
 								}
 							}
-							mid.Log().Info("Process" + pList.Name + ":启动成功 PID " + pNow.Pid)
+							mid.Log.Info("Process" + pList.Name + ":启动成功 PID " + pNow.Pid)
 							continue PGo
 						}
 					}
@@ -88,7 +88,7 @@ func AutoRun() {
 					for i, s := range mid.AppRunStatus {
 						if s.Name == pList.Name {
 							if !s.Msg {
-								mid.Log().Info("Process" + pList.Name + ":主程序异常退出,守护进程不受影响 PID " + pidOld)
+								mid.Log.Info("Process" + pList.Name + ":主程序异常退出,守护进程不受影响 PID " + pidOld)
 							}
 							mid.AppRunStatus[i].Msg = true
 							break
@@ -100,8 +100,8 @@ func AutoRun() {
 		}
 	})
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	c.Crons.Start()
-	mid.Log().Info("Process on */10 * * * * * TaskID:" + strconv.Itoa(int(taskId)))
+	mid.Log.Info("Process on */10 * * * * * TaskID:" + strconv.Itoa(int(taskId)))
 }

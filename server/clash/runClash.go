@@ -70,17 +70,17 @@ func (R *RunClash) installWeb(clash RunClash) bool {
 	clash.Path = "./config/dashboard.zip"
 	url := fmt.Sprintf("%v%v", "https://ghproxy.com/", clash.WebUrl)
 	if !con.Down(url, clash.Path) {
-		mid.Log().Info("Clash " + clash.Path + " 下载失败")
+		mid.Log.Info("Clash " + clash.Path + " 下载失败")
 		return false
 	}
 	_, err := mod.ExecCommandWithResult("unzip -o -d " + mid.Dir + "/config/dashboard " + mid.Dir + "/config/dashboard.zip")
 	if err != nil {
-		mid.Log().Error("解压缩失败")
+		mid.Log.Error("解压缩失败")
 		return false
 	}
 	err = mod.ExecCommand("rm -rf " + mid.Dir + "/config/dashboard.zip")
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 		return false
 	}
 	return true

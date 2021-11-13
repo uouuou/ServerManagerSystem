@@ -12,12 +12,12 @@ var db = util.GetDB()
 func IntSqlStart() {
 	err := db.AutoMigrate(&mod.Process{})
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + "SQL注册异常" + err.Error())
+		mid.Log.Error(mid.RunFuncName() + "SQL注册异常" + err.Error())
 		return
 	}
 	err = db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&mod.Process{})
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + "SQL注册异常" + err.Error())
+		mid.Log.Error(mid.RunFuncName() + "SQL注册异常" + err.Error())
 		return
 	}
 }

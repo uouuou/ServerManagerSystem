@@ -18,23 +18,23 @@ func TestReadable() {
 			reboot := exec.Command("reboot")
 			err := touch.Run()
 			if err != nil {
-				mid.Log().Info(fmt.Sprintf("可读性异常，准备重启:%v", err))
+				mid.Log.Info(fmt.Sprintf("可读性异常，准备重启:%v", err))
 				err = reboot.Run()
 				if err != nil {
-					mid.Log().Info(fmt.Sprintf("err:%v", err))
+					mid.Log.Info(fmt.Sprintf("err:%v", err))
 				}
 			} else {
 				rm := exec.Command("rm", "-rf", "/opt/readonly_test")
 				err = rm.Run()
-				mid.Log().Info("系统无异常......")
+				mid.Log.Info("系统无异常......")
 				if err != nil {
-					mid.Log().Info(fmt.Sprintf("err:%v", err))
+					mid.Log.Info(fmt.Sprintf("err:%v", err))
 				}
 			}
 		}
 	case "windows":
 		{
-			mid.Log().Info("WIN不需要开机可读性检测.....")
+			mid.Log.Info("WIN不需要开机可读性检测.....")
 		}
 
 	}

@@ -55,28 +55,28 @@ func Login(c *gin.Context) {
 		}
 		err = mid.Set([]byte(uuid), []byte(users.Name), 60*60)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		err = mid.Set([]byte(uuid+"role"), []byte(strconv.Itoa(users.RoleID)), 60*60)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 
 		if err := db.Model(&user.Role{}).Where("id = ?", users.RoleID).Find(&role).Error; err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 			mid.DataErr(c, err, "角色查询异常")
 			return
 		}
 		treeLists := menu.GetRoleMenu(users, role)
 		marshal, err := json.Marshal(treeLists)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 			mid.DataErr(c, err, "数据格式化异常")
 			return
 		}
 		err = mid.Set([]byte(uuid+"menu"), marshal, 1024*1024)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 			mid.DataErr(c, err, "数据写入缓存异常")
 			return
 		}

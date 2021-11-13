@@ -241,7 +241,7 @@ func SftpDownload(c *gin.Context) {
 			mid.ClientErr(c, err, "文件读取异常")
 			return
 		}
-		nameString:=strings.Split(f.Name(),"/")
+		nameString := strings.Split(f.Name(), "/")
 		extraHeaders := map[string]string{
 			"Content-Disposition": fmt.Sprintf(`attachment; filename="%s"`, nameString[len(nameString)-1]),
 		}
@@ -339,7 +339,7 @@ func SftpRm(c *gin.Context) {
 	var rmInfos rmInfo
 	err := c.ShouldBind(&rmInfos)
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("err:%v", err))
+		mid.Log.Error(fmt.Sprintf("err:%v", err))
 		mid.ClientBreak(c, err, "格式错误")
 		return
 	}

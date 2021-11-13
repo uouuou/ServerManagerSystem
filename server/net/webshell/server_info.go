@@ -62,11 +62,11 @@ func CreateHardwareInfo(sid string, cols int, rows int) (hi *HardwareInfo, err e
 	}(client)
 	hi.Disk, err = SshRemoteRunCommand(client, "df -h")
 	if err != nil {
-		mid.Log().Error("Server:" + sid + "获取硬盘失败")
+		mid.Log.Error("Server:" + sid + "获取硬盘失败")
 	}
 	hi.Mem, err = SshRemoteRunCommand(client, "free -m")
 	if err != nil {
-		mid.Log().Error("Server:" + sid + "获取内存失败")
+		mid.Log.Error("Server:" + sid + "获取内存失败")
 	}
 	hi.NetCard, err = SshRemoteRunCommand(client, "ifconfig")
 	if err != nil {
@@ -74,32 +74,32 @@ func CreateHardwareInfo(sid string, cols int, rows int) (hi *HardwareInfo, err e
 		if err == nil {
 			hi.NetCard, err = SshRemoteRunCommand(client, "ifconfig")
 			if err != nil {
-				mid.Log().Error("Server:" + sid + "获取网卡失败")
+				mid.Log.Error("Server:" + sid + "获取网卡失败")
 			}
 		} else {
-			mid.Log().Error("Server:" + sid + "按钻NET工具失败")
+			mid.Log.Error("Server:" + sid + "按钻NET工具失败")
 		}
 	}
 	hi.Cpu, err = SshRemoteRunCommand(client, "cat /proc/cpuinfo")
 	if err != nil {
-		mid.Log().Error("Server:" + sid + "获取CPU失败")
+		mid.Log.Error("Server:" + sid + "获取CPU失败")
 	}
 
 	hi.System, err = SshRemoteRunCommand(client, "uname -a;who -a;")
 	if err != nil {
-		mid.Log().Error("Server:" + sid + "获取系统失败")
+		mid.Log.Error("Server:" + sid + "获取系统失败")
 	}
 	hi.Login, err = SshRemoteRunCommand(client, "w;last")
 	if err != nil {
-		mid.Log().Error("Server:" + sid + "获取Login失败")
+		mid.Log.Error("Server:" + sid + "获取Login失败")
 	}
 	hi.Ps, err = SshRemoteRunCommand(client, "ps -aux")
 	if err != nil {
-		mid.Log().Error("Server:" + sid + "获取ps失败")
+		mid.Log.Error("Server:" + sid + "获取ps失败")
 	}
 	hi.Port, err = SshRemoteRunCommand(client, "netstat -lntp")
 	if err != nil {
-		mid.Log().Error("Server:" + sid + "获取netstat失败")
+		mid.Log.Error("Server:" + sid + "获取netstat失败")
 	}
 	return hi, nil
 }

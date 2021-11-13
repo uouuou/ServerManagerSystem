@@ -123,12 +123,12 @@ func init() {
 	// 客户端和服务端的整体通信超时时间
 	Caller.HeartBeat = time.Second * 5
 	socketHandler.OnAccept = func(c net.Conn) net.Conn {
-		mid.Log().Info(c.RemoteAddr().String() + " -> " + c.LocalAddr().String() + " connected")
+		mid.Log.Info(c.RemoteAddr().String() + " -> " + c.LocalAddr().String() + " connected")
 		return c
 	}
 	//设置用户在连接关闭后的反映
 	socketHandler.OnClose = func(c net.Conn) {
-		mid.Log().Warning(c.RemoteAddr().String() + " -> " + c.LocalAddr().String() + " closed on client")
+		mid.Log.Warning(c.RemoteAddr().String() + " -> " + c.LocalAddr().String() + " closed on client")
 	}
 }
 
@@ -137,13 +137,13 @@ func RunRpc() {
 	//使用net监听tcp端口用于数据交互
 	server, err := net.Listen("tcp", ":"+strconv.Itoa(util.RpcPort))
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 		return
 	}
 	//service绑定监听
 	err = Service.Bind(server)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 		return
 	}
 }
@@ -265,7 +265,7 @@ func ReverseHello(c *gin.Context) {
 					Caller.UseService(&proxy, s)
 					result, err = proxy.Hello("world")
 					if err != nil {
-						mid.Log().Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
+						mid.Log.Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
 						result = err.Error()
 					}
 					result = result + ":" + s
@@ -296,7 +296,7 @@ func ReverseInvokeSql(c *gin.Context) {
 			//SELECT * FROM `processes` WHERE `processes`.`deleted_at` IS NULL
 			res, err := proxy.SqlSet(sql)
 			if err != nil {
-				mid.Log().Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
+				mid.Log.Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
 				mid.DataNot(c, err.Error(), "远程调用失败")
 				return
 			}
@@ -337,7 +337,7 @@ func ReverseInvokeEveryOneSql(c *gin.Context) {
 			//SELECT * FROM `processes` WHERE `processes`.`deleted_at` IS NULL
 			res, err := proxy.SpecifySqlReverse(run)
 			if err != nil {
-				mid.Log().Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
+				mid.Log.Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
 				mid.DataNot(c, err.Error(), "远程调用失败")
 				return
 			}
@@ -391,7 +391,7 @@ func ReverseInvokeEveryAnySql(c *gin.Context) {
 			//SELECT * FROM `processes` WHERE `processes`.`deleted_at` IS NULL
 			res, err := proxy.SpecifySqlReverse(run)
 			if err != nil {
-				mid.Log().Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
+				mid.Log.Error(mid.RunFuncName() + ":远程调度异常 " + err.Error())
 				mid.DataNot(c, err.Error(), "远程调用失败")
 				return
 			}

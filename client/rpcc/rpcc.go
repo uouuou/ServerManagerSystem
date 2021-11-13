@@ -85,11 +85,11 @@ func RpcClient() *rpc.Client {
 	client.Use(ClientCompressHandler)
 	socketTransport := rpc.SocketTransport(client)
 	socketTransport.OnConnect = func(c net.Conn) net.Conn {
-		mid.Log().Info(c.LocalAddr().String() + " -> " + c.RemoteAddr().String() + " connected")
+		mid.Log.Info(c.LocalAddr().String() + " -> " + c.RemoteAddr().String() + " connected")
 		return c
 	}
 	socketTransport.OnClose = func(c net.Conn) {
-		mid.Log().Warning(c.LocalAddr().String() + " -> " + c.RemoteAddr().String() + " closed on client")
+		mid.Log.Warning(c.LocalAddr().String() + " -> " + c.RemoteAddr().String() + " closed on client")
 	}
 	return client
 }
@@ -115,10 +115,10 @@ func ProsumerFun() *push.Prosumer {
 	//client.Use(log.Plugin)
 	prosumer := push.NewProsumer(Client, mid.GetCUId())
 	prosumer.OnSubscribe = func(topic string) {
-		mid.Log().Info(topic + " is subscribed.")
+		mid.Log.Info(topic + " is subscribed.")
 	}
 	prosumer.OnUnsubscribe = func(topic string) {
-		mid.Log().Info(topic + " is unsubscribed.")
+		mid.Log.Info(topic + " is unsubscribed.")
 	}
 	prosumer.RetryInterval = time.Second * 2
 	return prosumer
@@ -171,7 +171,7 @@ func RegisterFrpc(client *rpc.Client) bool {
 		r.NpsVersion = npsVersionNow[1]
 		register, err := stub.Register(r)
 		if err != nil {
-			mid.Log().Error(mid.RunFuncName() + ": RPC调度异常：" + err.Error())
+			mid.Log.Error(mid.RunFuncName() + ": RPC调度异常：" + err.Error())
 			continue
 		}
 		switch register.Code {
@@ -179,7 +179,7 @@ func RegisterFrpc(client *rpc.Client) bool {
 			rs := register.Data.(*registered.Register)
 			mid.NatAuth = rs.NatAuth
 			mid.CronAuth = rs.CronAuth
-			mid.Log().Info(register.Message)
+			mid.Log.Info(register.Message)
 		case 2001:
 			rs := register.Data.(*registered.Register)
 			mid.NatAuth = rs.NatAuth
@@ -208,21 +208,21 @@ func RegisterFrpc(client *rpc.Client) bool {
 							if res.Code == 2000 {
 								resDate := p.OffRpcProcess(process)
 								if resDate.Code == 2000 {
-									mid.Log().Info(mid.RunFuncName() + ":" + resDate.Message)
+									mid.Log.Info(mid.RunFuncName() + ":" + resDate.Message)
 								} else {
-									mid.Log().Error(mid.RunFuncName() + ":" + resDate.Message)
+									mid.Log.Error(mid.RunFuncName() + ":" + resDate.Message)
 								}
-								mid.Log().Info(mid.RunFuncName() + ":" + res.Message)
+								mid.Log.Info(mid.RunFuncName() + ":" + res.Message)
 							} else {
-								mid.Log().Error(mid.RunFuncName() + ":" + res.Message)
+								mid.Log.Error(mid.RunFuncName() + ":" + res.Message)
 							}
 						}
 					}
 					err = os.WriteFile(mid.Dir+"/config/nps/npc.conf", []byte(rs.NpsConfig), 0755)
 					if err != nil {
-						mid.Log().Error(mid.RunFuncName() + " :数据写入失败 " + err.Error())
+						mid.Log.Error(mid.RunFuncName() + " :数据写入失败 " + err.Error())
 					}
-					mid.Log().Info("NPC配置文件已更新")
+					mid.Log.Info("NPC配置文件已更新")
 				}
 			}
 			if !reflect.DeepEqual(mid.GetFRTPConfig(), rs.FrpConfig) {
@@ -237,13 +237,13 @@ func RegisterFrpc(client *rpc.Client) bool {
 					}
 					err = os.WriteFile(mid.Dir+"/config/frp/frpc.ini", []byte(rs.FrpConfig), 0755)
 					if err != nil {
-						mid.Log().Error(mid.RunFuncName() + " :数据写入失败 " + err.Error())
+						mid.Log.Error(mid.RunFuncName() + " :数据写入失败 " + err.Error())
 					}
-					mid.Log().Info("FRP配置文件已更新")
+					mid.Log.Info("FRP配置文件已更新")
 				}
 			}
 		case 2003:
-			mid.Log().Error(mid.RunFuncName() + ":" + register.Message)
+			mid.Log.Error(mid.RunFuncName() + ":" + register.Message)
 		}
 	}
 	return false
@@ -259,13 +259,13 @@ func TimeTest() {
 			}
 			m, err := Prosumer.Push(res, "test", mid.GetCUId())
 			if err != nil {
-				mid.Log().Error(mid.RunFuncName() + " :err " + err.Error())
+				mid.Log.Error(mid.RunFuncName() + " :err " + err.Error())
 			}
-			mid.Log().Infof("push info %v", m)
+			mid.Log.Infof("push info %v", m)
 		}
 	})
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + err.Error())
+		mid.Log.Error(mid.RunFuncName() + err.Error())
 	}
 	/* 远程调用方法
 	result, err := client.Invoke("Time", []interface{}{"too difficult"})
@@ -280,7 +280,7 @@ func UpdateClient() {
 	io.RegisterName("updateData", (*mod.Update)(nil))
 	_, err := Prosumer.Subscribe("update", func(data *mod.Update, from string) {
 		if UpdateStatus {
-			mid.Log().Warning("有更新任务正在继续，请稍后重试......")
+			mid.Log.Warning("有更新任务正在继续，请稍后重试......")
 			return
 		}
 		if gin.Mode() == "release" {
@@ -292,14 +292,14 @@ func UpdateClient() {
 			switch architecture {
 			case "arm64":
 				if !con.Down(mid.GetServerHttp()+data.UrlArm, mid.Dir+"/config/"+mid.MainName+"_tmp") {
-					mid.Log().Error(mid.RunFuncName() + ":下载更新文件出现异常")
+					mid.Log.Error(mid.RunFuncName() + ":下载更新文件出现异常")
 					UpdateStatus = false
 					return
 				}
 				cmdStart = exec.Command("systemctl", "restart", "serverManager_"+mid.Mode)
 			case "amd64":
 				if !con.Down(mid.GetServerHttp()+data.UrlLinux, mid.Dir+"/config/"+mid.MainName+"_tmp") {
-					mid.Log().Error(mid.RunFuncName() + ":下载更新文件出现异常")
+					mid.Log.Error(mid.RunFuncName() + ":下载更新文件出现异常")
 					UpdateStatus = false
 					return
 				}
@@ -310,7 +310,7 @@ func UpdateClient() {
 			switch system {
 			case "windows":
 				{
-					mid.Log().Info(mid.RunFuncName() + ":暂时不支持WIN系统升级")
+					mid.Log.Info(mid.RunFuncName() + ":暂时不支持WIN系统升级")
 					UpdateStatus = false
 					return
 				}
@@ -318,39 +318,39 @@ func UpdateClient() {
 				{
 					err := cmd.Run()
 					if err != nil {
-						mid.Log().Info(mid.RunFuncName() + ":CMD执行错误 " + err.Error())
+						mid.Log.Info(mid.RunFuncName() + ":CMD执行错误 " + err.Error())
 						UpdateStatus = false
 						return
 					}
 
 					err = cmdMv.Run()
 					if err != nil {
-						mid.Log().Info(mid.RunFuncName() + ":CMD执行错误 " + err.Error())
+						mid.Log.Info(mid.RunFuncName() + ":CMD执行错误 " + err.Error())
 						UpdateStatus = false
 						return
 					}
 
-					mid.Log().Info(data.Version + ":更新已经完成,即将重启")
+					mid.Log.Info(data.Version + ":更新已经完成,即将重启")
 
 					err = cmdStart.Run()
 					if err != nil {
-						mid.Log().Info(mid.RunFuncName() + ":CMD执行错误 " + err.Error())
+						mid.Log.Info(mid.RunFuncName() + ":CMD执行错误 " + err.Error())
 						UpdateStatus = false
 						return
 					}
 
 				}
 			default:
-				mid.Log().Info(mid.RunFuncName() + ":暂时不支持" + system + "系统升级")
+				mid.Log.Info(mid.RunFuncName() + ":暂时不支持" + system + "系统升级")
 				UpdateStatus = false
 				return
 			}
 			UpdateStatus = false
 		} else {
-			mid.Log().Infof("更新版本：%v  linux版本地址：%v arm版本地址：%v 备注：%v", data.Version, data.UrlLinux, data.UrlArm, data.Remark)
+			mid.Log.Infof("更新版本：%v  linux版本地址：%v arm版本地址：%v 备注：%v", data.Version, data.UrlLinux, data.UrlArm, data.Remark)
 		}
 	})
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + err.Error())
+		mid.Log.Error(mid.RunFuncName() + err.Error())
 	}
 }

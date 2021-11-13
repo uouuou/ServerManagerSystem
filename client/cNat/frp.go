@@ -19,17 +19,17 @@ func FrpInstall() {
 	if info == "" {
 		info = "Info: Nps New Install"
 		if nat.UpdateFrp(mid.GetMode()) {
-			mid.Log().Info("安装FRP成功")
+			mid.Log.Info("安装FRP成功")
 		} else {
-			mid.Log().Info("安装NPS失败，请重启重试......")
+			mid.Log.Info("安装NPS失败，请重启重试......")
 		}
 		return
 	}
 	if "v"+info != nps.TagName {
 		if nat.UpdateFrp(mid.GetMode()) {
-			mid.Log().Info("更新FRP成功")
+			mid.Log.Info("更新FRP成功")
 		} else {
-			mid.Log().Info("更新FRP失败，请重启重试......")
+			mid.Log.Info("更新FRP失败，请重启重试......")
 		}
 		return
 	}
@@ -68,9 +68,9 @@ func FrpInstall() {
 		}
 		res := pf.AddRpcProcess(p)
 		if res.Code == 2000 {
-			mid.Log().Info(mid.RunFuncName() + res.Message)
+			mid.Log.Info(mid.RunFuncName() + res.Message)
 		} else {
-			mid.Log().Error(mid.RunFuncName() + res.Message)
+			mid.Log.Error(mid.RunFuncName() + res.Message)
 		}
 	}
 	if mid.GetMode() == "client" && mid.GetFRTPConfig() != "null" {
@@ -84,10 +84,10 @@ func FrpInstall() {
 		}
 		res := pf.AddRpcProcess(p)
 		if res.Code == 2000 {
-			mid.Log().Info(mid.RunFuncName() + res.Message)
+			mid.Log.Info(mid.RunFuncName() + res.Message)
 		} else {
-			mid.Log().Error(mid.RunFuncName() + res.Message)
+			mid.Log.Error(mid.RunFuncName() + res.Message)
 		}
 	}
-	mid.Log().Info(mid.RunFuncName() + ":FRP无需安装或更新......")
+	mid.Log.Info(mid.RunFuncName() + ":FRP无需安装或更新......")
 }

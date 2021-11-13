@@ -24,14 +24,14 @@ func AutoCronRun(client *rpc.Client) {
 		oldCronList = CronRunLists
 		nowCrons, err := stub.RpcCronList(mid.GetCUId())
 		if err != nil {
-			mid.Log().Error(mid.RunFuncName() + ": RPC调度异常：" + err.Error())
+			mid.Log.Error(mid.RunFuncName() + ": RPC调度异常：" + err.Error())
 			continue
 		}
 		if len(CronRunLists) == 0 {
 			for _, myCron := range nowCrons {
 				_, _, err := m.AddFun(myCron)
 				if err != nil {
-					mid.Log().Errorf("启动脚本异常：%v", err.Error())
+					mid.Log.Errorf("启动脚本异常：%v", err.Error())
 				}
 			}
 		}
@@ -45,7 +45,7 @@ func AutoCronRun(client *rpc.Client) {
 				}
 				_, _, err := m.AddFun(myCron)
 				if err != nil {
-					mid.Log().Errorf("启动脚本异常：%v", err.Error())
+					mid.Log.Errorf("启动脚本异常：%v", err.Error())
 				}
 			}
 
@@ -59,12 +59,12 @@ func AutoCronRun(client *rpc.Client) {
 					}
 				}
 				m.RemoveFun(list)
-				mid.Log().Infof("Cron在线更新成功Entries:%v", RunCron.Entries())
+				mid.Log.Infof("Cron在线更新成功Entries:%v", RunCron.Entries())
 			}
 		}
 		if len(nowCrons) > 0 && len(oldCronList) != len(nowCrons) {
 			m.Start()
-			mid.Log().Infof("Cron启动成功Entries:%v", RunCron.Entries())
+			mid.Log.Infof("Cron启动成功Entries:%v", RunCron.Entries())
 			continue
 		}
 	}

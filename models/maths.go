@@ -27,7 +27,7 @@ func Md5V(str string) string {
 	h := md5.New()
 	_, err := h.Write([]byte(str))
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("err:%v", err))
+		mid.Log.Error(fmt.Sprintf("err:%v", err))
 	}
 	return hex.EncodeToString(h.Sum(nil))
 

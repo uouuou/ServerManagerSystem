@@ -276,7 +276,7 @@ var upGrader = websocket.Upgrader{
 func publicKeyAuthFunc(key string) goSsh.AuthMethod {
 	signer, err := goSsh.ParsePrivateKey([]byte(key))
 	if err != nil {
-		mid.Log().Errorf("ssh key signer failed %v", err)
+		mid.Log.Errorf("ssh key signer failed %v", err)
 	}
 	return goSsh.PublicKeys(signer)
 }

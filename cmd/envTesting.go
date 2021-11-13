@@ -49,7 +49,7 @@ func EnvTesting() map[string]string {
 	infoClash, err := mod.ExecCommandWithResult("clash -v")
 	if err != nil {
 		if clash.UpdateClash("premium") {
-			mid.Log().Info("Clash初始化成功")
+			mid.Log.Info("Clash初始化成功")
 			infoClash, err = mod.ExecCommandWithResult("clash -v")
 			if err != nil {
 				infoClash = "unknown version"
@@ -57,7 +57,7 @@ func EnvTesting() map[string]string {
 			clashVersion := strings.Fields(strings.TrimSpace(infoClash))
 			ClashVersion = fmt.Sprintf("%v %v", clashVersion[0], clashVersion[1])
 		} else {
-			mid.Log().Error("Clash初始化失败")
+			mid.Log.Error("Clash初始化失败")
 		}
 	} else {
 		clashVersion := strings.Fields(strings.TrimSpace(infoClash))
@@ -73,9 +73,9 @@ func EnvTesting() map[string]string {
 	}
 	//检测Nps
 	if mod.NpsVersion() == "" {
-		mid.Log().Info("Nps Not Install")
+		mid.Log.Info("Nps Not Install")
 	} else {
-		mid.Log().Info("Nps Info:" + mod.NpsVersion())
+		mid.Log.Info("Nps Info:" + mod.NpsVersion())
 	}
 	return m
 }

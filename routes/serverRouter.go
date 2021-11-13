@@ -38,6 +38,7 @@ func ServerRouter() {
 	r.NoRoute(mid.HandleNotFound)
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.Use(mid.GinLog())
 	r.Use(mid.Cors())
 	t := template.Must(template.New("").ParseFS(mid.FS, "web/*.html"))
 	r.SetHTMLTemplate(t)

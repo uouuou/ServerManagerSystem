@@ -55,7 +55,7 @@ func ListUser(c *gin.Context) {
 	)
 	pages, Db := mid.GetPages(db, c.Query("page"), c.Query("page_size"), &users)
 	if err := Db.Where("name != ? and deleted_at IS NULL", "").Find(&users).Error; err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	for i, user := range users {
 		r, err := SRole(user.RoleID)

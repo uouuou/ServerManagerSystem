@@ -42,14 +42,14 @@ func (u Upload) FilesUpload(c *gin.Context) {
 	_dir := mid.Dir + "/upload/" + time.Now().Format("20060102")
 	exist, err := PathExists(_dir)
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("mkdir failed![%v]", err))
+		mid.Log.Error(fmt.Sprintf("mkdir failed![%v]", err))
 		return
 	}
 
 	if !exist {
 		err := os.MkdirAll(_dir, os.ModePerm)
 		if err != nil {
-			mid.Log().Error(fmt.Sprintf("mkdir failed![%v]", err))
+			mid.Log.Error(fmt.Sprintf("mkdir failed![%v]", err))
 		}
 	}
 

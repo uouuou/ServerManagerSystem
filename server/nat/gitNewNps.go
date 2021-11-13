@@ -71,14 +71,14 @@ func UpdateNps(start string) bool {
 		info = "Info: Nps New Install"
 	}
 	if nps.BrowserDownloadUrl == "" {
-		mid.Log().Info(mid.RunFuncName() + ":Nps接口请求异常")
+		mid.Log.Info(mid.RunFuncName() + ":Nps接口请求异常")
 		return false
 	}
 	npsInfo := strings.Split(info, ": ")
 	if "v"+npsInfo[1] != nps.TagName {
 		url := fmt.Sprintf("%v%v", "https://mirror.ghproxy.com/", nps.BrowserDownloadUrl)
 		if con.Down(url, nps.Path) {
-			mid.Log().Info("Nps " + nps.TagName + " 下载成功：" + nps.PathName)
+			mid.Log.Info("Nps " + nps.TagName + " 下载成功：" + nps.PathName)
 		}
 		pid := mod.ForPid("nps")
 		pids := strings.Split(pid, "\n")
@@ -91,7 +91,7 @@ func UpdateNps(start string) bool {
 			}
 			err := mod.ExecCommand("tar -zvxf " + mid.Dir + "/config/nps.gz -C " + mid.Dir + "/config/nps")
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 		} else {
 			if !mod.IsExists(mid.Dir + "/config/nps") {
@@ -109,12 +109,12 @@ func UpdateNps(start string) bool {
 			}
 			err := mod.ExecCommand("tar -zvxf " + mid.Dir + "/config/nps.gz -C " + mid.Dir + "/config/nps")
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 		}
 		err := mod.ExecCommand("chmod -R 755 " + mid.Dir + "/config/nps")
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		return true
 	} else {
@@ -132,7 +132,7 @@ func GetNpsNew(starts string) (Nps Nps) {
 	npsInfo := con.GetApi(url, nil)
 	err := json.Unmarshal(npsInfo, &gitApi)
 	if err != nil {
-		mid.Log().Error("NPS线上接口请求受限：" + err.Error())
+		mid.Log.Error("NPS线上接口请求受限：" + err.Error())
 		return
 	}
 	architecture, system := mid.GetArchitecture()
@@ -167,7 +167,7 @@ func MoNpsConfig(start string) []byte {
 	config, err := os.ReadFile(mid.Dir + "/config/nps/" + name)
 	if err != nil {
 		if !starts {
-			mid.Log().Error(mid.RunFuncName() + ":未找到配置文件，等待线上发布....")
+			mid.Log.Error(mid.RunFuncName() + ":未找到配置文件，等待线上发布....")
 			starts = true
 		}
 		return config
@@ -189,7 +189,7 @@ func SetNpsConfig(c *gin.Context) {
 	var frps frp
 	err := c.ShouldBind(&frps)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 		mid.ClientErr(c, err, "格式错误")
 		return
 	}

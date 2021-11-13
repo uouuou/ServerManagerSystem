@@ -18,18 +18,18 @@ func NpsInstall() {
 	if info == "" {
 		info = "Info: Nps New Install"
 		if nat.UpdateNps(mid.GetMode()) {
-			mid.Log().Info("安装NPS成功")
+			mid.Log.Info("安装NPS成功")
 		} else {
-			mid.Log().Info("安装NPS失败，请重启重试......")
+			mid.Log.Info("安装NPS失败，请重启重试......")
 		}
 		return
 	}
 	npsInfo := strings.Split(info, ": ")
 	if "v"+npsInfo[1] != nps.TagName {
 		if nat.UpdateNps(mid.GetMode()) {
-			mid.Log().Info("更新NPS成功")
+			mid.Log.Info("更新NPS成功")
 		} else {
-			mid.Log().Info("更新NPS失败，请重启重试......")
+			mid.Log.Info("更新NPS失败，请重启重试......")
 		}
 		return
 	}
@@ -71,9 +71,9 @@ func NpsInstall() {
 		}
 		res := pf.AddRpcProcess(p)
 		if res.Code == 2000 {
-			mid.Log().Info(mid.RunFuncName() + res.Message)
+			mid.Log.Info(mid.RunFuncName() + res.Message)
 		} else {
-			mid.Log().Error(mid.RunFuncName() + res.Message)
+			mid.Log.Error(mid.RunFuncName() + res.Message)
 		}
 	}
 	if mid.GetMode() == "client" && mid.GetFRTPConfig() != "null" {
@@ -87,10 +87,10 @@ func NpsInstall() {
 		}
 		res := pf.AddRpcProcess(p)
 		if res.Code == 2000 {
-			mid.Log().Info(mid.RunFuncName() + res.Message)
+			mid.Log.Info(mid.RunFuncName() + res.Message)
 		} else {
-			mid.Log().Error(mid.RunFuncName() + res.Message)
+			mid.Log.Error(mid.RunFuncName() + res.Message)
 		}
 	}
-	mid.Log().Info(mid.RunFuncName() + ":NPS无需安装或更新......")
+	mid.Log.Info(mid.RunFuncName() + ":NPS无需安装或更新......")
 }

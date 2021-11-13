@@ -16,11 +16,11 @@ func GetApi(url string, body io.Reader) []byte {
 	var resultBody []byte
 	req, err := http.NewRequest("GET", url, body)
 	if err != nil {
-		mid.Log().Info(fmt.Sprintf("err:%v", err))
+		mid.Log.Info(fmt.Sprintf("err:%v", err))
 	}
 	cancel, res, err := fetch(req)
 	if err != nil {
-		mid.Log().Info(fmt.Sprintf("err:%v", err))
+		mid.Log.Info(fmt.Sprintf("err:%v", err))
 		return nil
 	}
 	defer cancel()
@@ -30,7 +30,7 @@ func GetApi(url string, body io.Reader) []byte {
 	if res.StatusCode == http.StatusOK {
 		resultBody, err = io.ReadAll(res.Body)
 		if err != nil {
-			mid.Log().Info(fmt.Sprintf("err:%v", err))
+			mid.Log.Info(fmt.Sprintf("err:%v", err))
 		}
 	} else {
 		return nil
@@ -42,7 +42,7 @@ func GetApi(url string, body io.Reader) []byte {
 func Down(url string, path string) bool {
 	resp, err := http.Get(url)
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + ":下载异常 " + err.Error())
+		mid.Log.Error(mid.RunFuncName() + ":下载异常 " + err.Error())
 		return false
 	}
 	defer func(Body io.ReadCloser) {
@@ -52,7 +52,7 @@ func Down(url string, path string) bool {
 	// 创建一个文件用于保存
 	out, err := os.Create(path)
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + ":保存异常 " + err.Error())
+		mid.Log.Error(mid.RunFuncName() + ":保存异常 " + err.Error())
 		return false
 	}
 	defer func(out *os.File) {
@@ -62,7 +62,7 @@ func Down(url string, path string) bool {
 	// 然后将响应流和文件流对接起来
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		mid.Log().Error(mid.RunFuncName() + ":文件写入异常 " + err.Error())
+		mid.Log.Error(mid.RunFuncName() + ":文件写入异常 " + err.Error())
 		return false
 	}
 	return true

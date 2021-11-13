@@ -37,7 +37,7 @@ func (Process) ProcessRpcLists(page int, pageSize int) (pLists []mod.Process, pa
 		Db = Db.Limit(15)
 	}
 	if err := Db.Where("remark != ? and deleted_at IS NULL", "").Find(&processLists).Error; err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	for _, list := range processLists {
 		var pid []string
@@ -245,7 +245,7 @@ func ExecCommand(command string, path string, name string) (pid int, err error) 
 	stderr, _ := cmd.StderrPipe()
 
 	if err := cmd.Start(); err != nil {
-		mid.Log().Error(fmt.Sprintf("%v Error:The command is err: %v", mid.RunFuncName(), err))
+		mid.Log.Error(fmt.Sprintf("%v Error:The command is err: %v", mid.RunFuncName(), err))
 		return cmd.Process.Pid, err
 	}
 

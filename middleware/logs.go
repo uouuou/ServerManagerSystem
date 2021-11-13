@@ -1,49 +1,156 @@
 package middleware
 
 import (
-	"log"
-
-	loggers "github.com/phachon/go-logger"
+	"fmt"
+	nested "github.com/antonfisher/nested-logrus-formatter"
+	"github.com/gin-gonic/gin"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/rifflock/lfshook"
+	"github.com/sirupsen/logrus"
+	"os"
+	"path/filepath"
+	"runtime"
+	"time"
 )
 
-func Log() *loggers.Logger {
-	logger := loggers.NewLogger()
+var (
+	Log *logrus.Logger
+)
 
-	err := logger.Detach("console")
+// InitLogger 系统日志准备
+func InitLogger() {
+	Log = logrus.New()
+	//创建Hook
+	hook := NewLfsHook(filepath.Join("log", "ServerManagerSystem"), 24*time.Hour, 15)
+	Log.AddHook(hook)
+	//日志格式化
+	Log.SetFormatter(formatter(true))
+	//日志级别
+	Log.SetLevel(logrus.InfoLevel)
+	//是否开启显示方法
+	Log.SetReportCaller(true)
+}
+
+// GinLog Gin的日志记录
+func GinLog() gin.HandlerFunc {
+	logger := logrus.New()
+	//日志格式化
+	logger.SetFormatter(formatter(true))
+	//日志级别
+	logger.SetLevel(logrus.InfoLevel)
+	//是否开启显示方法
+	logger.SetReportCaller(false)
+	//禁止logrus的输出
+	src, err := os.OpenFile(os.DevNull, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
-		log.Print(err)
+		Log.Error(err.Error())
 	}
-	// 命令行输出配置
-	consoleConfig := &loggers.ConsoleConfig{
-		Color:      true,  // 命令行输出字符串是否显示颜色
-		JsonFormat: false, // 命令行输出字符串是否格式化
-		Format:     "",    // 如果输出的不是 json 字符串，JsonFormat: false, 自定义输出的格式
+	logger.Out = src
+	//创建Hook
+	hook := NewLfsHook(filepath.Join("log", "ServerManagerSystemGinLog"), 24*time.Hour, 15)
+	logger.AddHook(hook)
+	return func(c *gin.Context) {
+		// 开始时间
+		startTime := time.Now()
+		// 处理请求
+		c.Next()
+		// 结束时间
+		endTime := time.Now()
+		// 执行时间
+		latencyTime := endTime.Sub(startTime)
+		//hostname
+		hostName, err := os.Hostname()
+		if err != nil {
+			hostName = "unknown"
+		}
+		// 请求方式
+		reqMethod := c.Request.Method
+		// 请求路由
+		reqUri := c.Request.RequestURI
+		// 状态码
+		statusCode := c.Writer.Status()
+		// 请求长度
+		dataSize := c.Writer.Size()
+		if dataSize < 0 {
+			dataSize = 0
+		}
+		// 请求IP
+		clientIP := c.ClientIP()
+		//用户浏览器
+		userAgent := c.Request.UserAgent()
+		// 日志格式
+		entry := logger.WithFields(logrus.Fields{
+			"HostName":    hostName,
+			"Status":      statusCode,
+			"LatencyTime": latencyTime,
+			"Ip":          clientIP,
+			"Method":      reqMethod,
+			"Path":        reqUri,
+			"DataSize":    dataSize,
+			"UserAgent":   userAgent,
+		})
+		if len(c.Errors) > 0 {
+			entry.Error(c.Errors.ByType(gin.ErrorTypePrivate).String())
+		}
+		if len(c.Errors) >= 500 {
+			entry.Error(c.Errors.ByType(gin.ErrorTypePrivate).String())
+		} else if statusCode >= 400 {
+			entry.Warn(c.Errors.ByType(gin.ErrorTypePrivate).String())
+		} else {
+			entry.Info(c.Errors.ByType(gin.ErrorTypePrivate).String())
+		}
 	}
-	// 添加 console 为 logger 的一个输出
-	err = logger.Attach("console", loggers.LOGGER_LEVEL_DEBUG, consoleConfig)
-	if err != nil {
-		log.Print(err)
-	}
-	// 文件输出配置
-	fileConfig := &loggers.FileConfig{
-		Filename: Dir + "/log/console.log", // 日志输出文件名，不自动存在
-		// 如果要将单独的日志分离为文件，请配置LevelFileNem参数。
-		LevelFileName: map[int]string{
-			logger.LoggerLevel("error"):   Dir + "/log/console_error.log",   // Error 级别日志被写入 console_error .log 文件
-			logger.LoggerLevel("info"):    Dir + "/log/console_info.log",    // Info 级别日志被写入到 console_info.log 文件中
-			logger.LoggerLevel("debug"):   Dir + "/log/console_debug.log",   // Debug 级别日志被写入到 console_debug.log 文件中
-			logger.LoggerLevel("warning"): Dir + "/log/console_warning.log", // Debug 级别日志被写入到 console_warning.log 文件中
+}
+
+//日志格式化设置
+func formatter(isConsole bool) *nested.Formatter {
+	formatTer := &nested.Formatter{
+		HideKeys:        true,
+		TimestampFormat: "2006-01-02 15:04:05",
+		CallerFirst:     true,
+		CustomCallerFormatter: func(frame *runtime.Frame) string {
+			funcInfo := runtime.FuncForPC(frame.PC)
+			if funcInfo == nil {
+				return "error during runtime.FuncForPC"
+			}
+			fullPath, line := funcInfo.FileLine(frame.PC)
+			return fmt.Sprintf(" [%v:%v]", filepath.Base(fullPath), line)
 		},
-		MaxSize:    1024 * 1024, // 文件最大值（KB），默认值0不限
-		MaxLine:    100000,      // 文件最大行数，默认 0 不限制
-		DateSlice:  "d",         // 文件根据日期切分， 支持 "Y" (年), "m" (月), "d" (日), "H" (时), 默认 "no"， 不切分
-		JsonFormat: true,        // 写入文件的数据是否 json 格式化
-		Format:     "",          // 如果写入文件的数据不 json 格式化，自定义日志格式
 	}
-	// 添加 file 为 logger 的一个输出
-	err = logger.Attach("file", loggers.LOGGER_LEVEL_DEBUG, fileConfig)
+	if isConsole {
+		formatTer.NoColors = false
+	} else {
+		formatTer.NoColors = true
+	}
+	return formatTer
+}
+
+//NewLfsHook 位置Hook设置
+func NewLfsHook(logName string, rotationTime time.Duration, leastDay uint) logrus.Hook {
+	writer, err := rotatelogs.New(
+		// 日志文件
+		logName+".%Y%m%d%H%M%S"+".log",
+		// 日志周期(默认每86400秒/一天旋转一次)
+		rotatelogs.WithRotationTime(rotationTime),
+		// 生成软链，指向最新日志文件
+		//rotatelogs.WithLinkName(logName+".log"),
+		// 清除历史 (WithMaxAge和WithRotationCount只能选其一)
+		//rotatelogs.WithMaxAge(time.Hour*24*7), //默认每7天清除下日志文件
+		rotatelogs.WithRotationCount(leastDay), //只保留最近的N个日志文件
+	)
 	if err != nil {
-		log.Print(err)
+		panic(err)
 	}
-	return logger
+	// 可设置按不同level创建不同的文件名
+	lfsHook := lfshook.NewHook(lfshook.WriterMap{
+		logrus.DebugLevel: writer,
+		logrus.InfoLevel:  writer,
+		logrus.WarnLevel:  writer,
+		logrus.ErrorLevel: writer,
+		logrus.FatalLevel: writer,
+		logrus.PanicLevel: writer,
+		//}, &logrus.JSONFormatter{TimestampFormat: "2006-01-02 15:04:05"})
+	}, formatter(false))
+
+	return lfsHook
 }

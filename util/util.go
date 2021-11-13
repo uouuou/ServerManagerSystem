@@ -59,6 +59,8 @@ var DB *gorm.DB
 func init() {
 	var sqlErr error
 	system := runtime.GOOS
+	//注册系统日志
+	mid.NewRoutine(mid.InitLogger)
 	switch system {
 	case "linux":
 		{
@@ -67,16 +69,16 @@ func init() {
 			reboot := exec.Command("reboot")
 			err := touch.Run()
 			if err != nil {
-				mid.Log().Info(fmt.Sprintf("err:%v", err))
+				mid.Log.Info(fmt.Sprintf("err:%v", err))
 				err = reboot.Run()
 				if err != nil {
-					mid.Log().Info(fmt.Sprintf("err:%v", err))
+					mid.Log.Info(fmt.Sprintf("err:%v", err))
 				}
 			} else {
 				rm := exec.Command("rm", "-rf", "/opt/readonly_test")
 				err = rm.Run()
 				if err != nil {
-					mid.Log().Info(fmt.Sprintf("err:%v", err))
+					mid.Log.Info(fmt.Sprintf("err:%v", err))
 				}
 			}
 		}
@@ -94,17 +96,17 @@ func init() {
 		if err != nil {
 			_, err = os.Create(configFile)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			} else {
 				config, err = os.ReadFile(configFile)
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 			}
 		}
 		err = yaml.Unmarshal(config, &conf)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		Port = conf.Port
 		if Port == 0 || conf.Server == "" || conf.Userid == "" || conf.ServerHttp == "" || conf.Auth == "" {
@@ -116,11 +118,11 @@ func init() {
 
 			data, err := yaml.Marshal(conf)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 			err = os.WriteFile(configFile, data, 0777)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 		}
 		mid.CUId = conf.Userid
@@ -135,7 +137,7 @@ func init() {
 				if os.IsNotExist(err) {
 					err := os.MkdirAll(configDir, os.ModePerm)
 					if err != nil {
-						mid.Log().Info(fmt.Sprintf("err:%v", err))
+						mid.Log.Info(fmt.Sprintf("err:%v", err))
 					}
 					return
 				}
@@ -144,7 +146,7 @@ func init() {
 			// 创建一个数据库文件
 			file, err := os.Create(dsn)
 			if err != nil {
-				mid.Log().Info(fmt.Sprintf("err:%v", err))
+				mid.Log.Info(fmt.Sprintf("err:%v", err))
 			}
 			defer func(file *os.File) {
 				_ = file.Close()
@@ -163,17 +165,17 @@ func init() {
 		if err != nil {
 			_, err = os.Create(configFile)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			} else {
 				config, err = os.ReadFile(configFile)
 				if err != nil {
-					mid.Log().Error(err.Error())
+					mid.Log.Error(err.Error())
 				}
 			}
 		}
 		err = yaml.Unmarshal(config, &conf)
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		Port = conf.Setting.Port
 		RpcPort = conf.Setting.RpcPort
@@ -185,11 +187,11 @@ func init() {
 			conf.Setting.RedType = ".txt|.sh|.log|.config|.ini|.in|.md"
 			data, err := yaml.Marshal(conf)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 			err = os.WriteFile(configFile, data, 0777)
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 		}
 		// 设置中间件读取一些需要的配置信息
@@ -213,7 +215,7 @@ func init() {
 					if os.IsNotExist(err) {
 						err := os.MkdirAll(configDir, os.ModePerm)
 						if err != nil {
-							mid.Log().Info(fmt.Sprintf("err:%v", err))
+							mid.Log.Info(fmt.Sprintf("err:%v", err))
 						}
 						return
 					}
@@ -222,7 +224,7 @@ func init() {
 				// 创建一个数据库文件
 				file, err := os.Create(dsn)
 				if err != nil {
-					mid.Log().Info(fmt.Sprintf("err:%v", err))
+					mid.Log.Info(fmt.Sprintf("err:%v", err))
 				}
 				defer func(file *os.File) {
 					_ = file.Close()
@@ -237,14 +239,14 @@ func init() {
 	}
 
 	if sqlErr != nil {
-		mid.Log().Error(fmt.Sprintf("Sql connect error %v\n", sqlErr))
+		mid.Log.Error(fmt.Sprintf("Sql connect error %v\n", sqlErr))
 	}
 	if DB.Error != nil {
-		mid.Log().Error(fmt.Sprintf("database error %v\n", DB.Error))
+		mid.Log.Error(fmt.Sprintf("database error %v\n", DB.Error))
 	}
 	sqlDB, err := DB.DB()
 	if err != nil {
-		mid.Log().Error(fmt.Sprintf("sql err:%v\n", err))
+		mid.Log.Error(fmt.Sprintf("sql err:%v\n", err))
 	}
 	// 连接池最多同时打开的连接数
 	sqlDB.SetMaxOpenConns(200)
@@ -267,7 +269,7 @@ func GetDB() *gorm.DB {
 func RouterInit() {
 	var menu []mid.Menu
 	if err := DB.Model(&menu).Where("authority = 1 and deleted_at IS NULL").Find(&menu).Error; err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	mid.MenuList = menu
 }

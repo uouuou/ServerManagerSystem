@@ -86,14 +86,14 @@ func UpdateClash(version string) bool {
 	if clashInfo[1] != clash.TagName {
 		url := fmt.Sprintf("%v%v", "https://ghproxy.com/", clash.BrowserDownloadUrl)
 		if con.Down(url, clash.Path) {
-			mid.Log().Info("Clash " + clash.TagName + " 下载成功：" + clash.ClashName)
+			mid.Log.Info("Clash " + clash.TagName + " 下载成功：" + clash.ClashName)
 		}
 		pid := mod.ForPid("clash")
 		pids := strings.Split(pid, "\n")
 		if pids[0] == " " {
 			err := mod.ExecCommand("gunzip -c " + mid.Dir + "/config/clash.gz > /usr/local/bin/clash")
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 			go run.Run(run)
 		} else {
@@ -106,14 +106,14 @@ func UpdateClash(version string) bool {
 			}
 			err := mod.ExecCommand("gunzip -c " + mid.Dir + "/config/clash.gz > /usr/local/bin/clash")
 			if err != nil {
-				mid.Log().Error(err.Error())
+				mid.Log.Error(err.Error())
 			}
 			go run.Run(run)
 		}
 
 		err := mod.ExecCommand("chmod -R 755 /usr/local/bin/clash")
 		if err != nil {
-			mid.Log().Error(err.Error())
+			mid.Log.Error(err.Error())
 		}
 		return true
 	} else {
@@ -136,7 +136,7 @@ func GetClashNew(version string) (clash Clash) {
 	clashInfo := con.GetApi(clashUrl, nil)
 	err := json.Unmarshal(clashInfo, &gitApi)
 	if err != nil {
-		mid.Log().Error(err.Error())
+		mid.Log.Error(err.Error())
 	}
 	architecture, system := mid.GetArchitecture()
 	clash.Path = mid.Dir + "/config/clash.gz"
