@@ -188,7 +188,15 @@ func GetRoleMenu(users mod.User, role user.Role) []TreeList {
 			}
 			treeLists = append(treeLists, treeListTest)
 		}
-		sort.Sort(BySort(treeLists))
+		for _, menu := range menuClass.TopMenu {
+			if menu == 1 {
+				for _, m := range menuClass.Menu {
+					if m.Id == uint(menu) {
+						treeLists = append(treeLists, TreeListPrepare(m, nil))
+					}
+				}
+			}
+		}
 		for i, list := range treeLists {
 			if list.MenuCode != 1 {
 				for _, s := range menuClass.MenuList {
