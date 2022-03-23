@@ -48,21 +48,23 @@ func authCheck() gin.HandlerFunc {
 			c.Abort()
 		}
 		url := strings.Split(c.Request.URL.Path, "/")
+	a:
 		for i, list := range treeList {
 			if string(role) == "1" {
 				c.Next()
-				break
+				break a
 			}
+		b:
 			for _, child := range list.Children {
 				urls := strings.Split(child.Url, "/")
 				if url[len(url)-3] != urls[len(urls)-2] {
-					break
+					break b
 				}
 				for _, m := range list.Children {
 					urls = strings.Split(m.Url, "/")
 					if url[len(url)-2] == urls[len(urls)-1] {
 						c.Next()
-						break
+						break a
 					}
 				}
 			}

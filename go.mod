@@ -20,7 +20,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2
-	github.com/hprose/hprose-golang/v3 v3.0.0-beta2
+	github.com/hprose/hprose-golang/v3 v3.0.0-beta3
 	github.com/joho/godotenv v1.3.0
 	github.com/kardianos/service v1.2.0
 	github.com/leodido/go-urn v1.2.1 // indirect

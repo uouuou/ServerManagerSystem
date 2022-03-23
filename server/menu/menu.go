@@ -5,6 +5,7 @@ import (
 	mod "github.com/uouuou/ServerManagerSystem/models"
 	"github.com/uouuou/ServerManagerSystem/server/user"
 	"github.com/uouuou/ServerManagerSystem/util"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -39,6 +40,82 @@ type TreeList struct {
 	UpdateUser string `json:"update_user"`                   // 更新人
 }
 
+// BySort 一个处理TreeList排序的接口方法
+type BySort []TreeList
+
+func (a BySort) Len() int           { return len(a) }
+func (a BySort) Less(i, j int) bool { return a[i].Sort < a[j].Sort }
+func (a BySort) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+// MenusSort 一个处理TreeList排序的接口方法
+type MenusSort []Menu
+
+func (a MenusSort) Len() int           { return len(a) }
+func (a MenusSort) Less(i, j int) bool { return a[i].Sort < a[j].Sort }
+func (a MenusSort) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+// MenusClass 分拣菜单类别
+type MenusClass struct {
+	TopMenu  []int  `json:"top_menu"`  //主分类
+	MenuList []int  `json:"menu_list"` //子分类
+	Menu     []Menu //菜单主数据
+}
+
+// MenusClassFunc 拆分传入的数据中的角色权限的菜单ID
+func MenusClassFunc(role string) (m MenusClass) {
+	var menus []Menu
+	var roles []string
+	db.Where("authority = 1 and deleted_at IS NULL").Order("sort").Find(&menus)
+	if role == "ADMIN" {
+		for _, s := range menus {
+			if s.ParentCode != 0 {
+				m.MenuList = append(m.MenuList, int(s.Id))
+			}
+		}
+		for _, s := range menus {
+			if s.ParentCode == 0 {
+				m.TopMenu = append(m.TopMenu, int(s.Id))
+			}
+		}
+	} else {
+		roles = strings.Split(role, ":")
+		for _, s := range roles {
+			for _, menu := range menus {
+				ss, _ := strconv.Atoi(s)
+				if menu.Id == uint(ss) && menu.ParentCode != 0 {
+					m.MenuList = append(m.MenuList, ss)
+				}
+			}
+		}
+		for _, s := range roles {
+			for _, menu := range menus {
+				ss, _ := strconv.Atoi(s)
+				if menu.Id == uint(ss) && menu.ParentCode == 0 {
+					m.TopMenu = append(m.TopMenu, ss)
+				}
+			}
+		}
+	}
+	m.Menu = menus
+	return
+}
+
+// TreeListPrepare 菜单树数据准备
+func TreeListPrepare(menuTest Menu, Children []Menu) (treeList TreeList) {
+	treeListTest := TreeList{
+		Id:         menuTest.Id,
+		MenuCode:   menuTest.MenuCode,
+		MenuName:   menuTest.MenuName,
+		ParentCode: menuTest.ParentCode,
+		Url:        menuTest.Url,
+		Icon:       menuTest.Icon,
+		Sort:       menuTest.Sort,
+		Authority:  menuTest.Authority,
+		Children:   Children,
+	}
+	return treeListTest
+}
+
 // GetMenuList 查看菜单列表
 func GetMenuList(c *gin.Context) {
 	var (
@@ -63,69 +140,70 @@ func GetMenuList(c *gin.Context) {
 // GetRoleMenu 获取对应的菜单列表
 func GetRoleMenu(users mod.User, role user.Role) []TreeList {
 	var (
-		menus     []Menu
 		treeLists []TreeList
 	)
 	switch users.RoleID {
 	case 1:
-		db.Where("authority = 1 and parent_code = 0 and deleted_at IS NULL").Order("sort").Group("menu_code").Find(&menus)
-		for _, v := range menus {
-			var treeList TreeList
-			var menu []Menu
-			if v.MenuCode != 1 {
-				db.Where("menu_code = ? and parent_code != 0 and authority = 1 and deleted_at IS NULL", v.MenuCode).Order("sort").Find(&menus)
-				for _, s := range menus {
-					menu = append(menu, s)
-				}
+		menuClass := MenusClassFunc(role.RoleCode)
+		for _, s := range menuClass.Menu {
+			if s.ParentCode == 0 {
+				treeLists = append(treeLists, TreeListPrepare(s, nil))
 			}
-			treeList.Icon = v.Icon
-			treeList.Id = v.Id
-			treeList.MenuCode = v.MenuCode
-			treeList.MenuName = v.MenuName
-			treeList.ParentCode = v.ParentCode
-			treeList.Sort = v.Sort
-			treeList.Url = v.Url
-			treeList.Children = menu
-			treeList.Authority = v.Authority
-			treeLists = append(treeLists, treeList)
 		}
-	default:
-		roles := strings.Split(role.RoleCode, ":")
-		for _, s := range roles {
-			db.Where("authority = 1 and deleted_at IS NULL").Order("sort").Group("menu_code").Find(&menus)
-			for _, m := range menus {
-				ss, _ := strconv.Atoi(s)
-				if m.Id == uint(ss) && m.ParentCode == 0 {
-					db.Where("authority = 1 and parent_code = 0 and id = ? and deleted_at IS NULL", ss).Order("sort").Group("menu_code").Find(&menus)
-					for _, v := range menus {
-						var treeList TreeList
-						var menu []Menu
-
-						if v.MenuCode != 1 {
-							db.Where("menu_code = ? and parent_code != 0 and authority = 1 and deleted_at IS NULL", v.MenuCode).Order("sort").Find(&menus)
-							for _, rs := range roles {
-								for _, s := range menus {
-									ss, _ := strconv.Atoi(rs)
-									if s.Id == uint(ss) {
-										menu = append(menu, s)
-									}
-								}
-							}
-						}
-						treeList.Icon = v.Icon
-						treeList.Id = v.Id
-						treeList.MenuCode = v.MenuCode
-						treeList.MenuName = v.MenuName
-						treeList.ParentCode = v.ParentCode
-						treeList.Sort = v.Sort
-						treeList.Url = v.Url
-						treeList.Children = menu
-						treeList.Authority = v.Authority
-						treeLists = append(treeLists, treeList)
+		for _, s := range menuClass.Menu {
+			if s.ParentCode != 0 {
+				for i, list := range treeLists {
+					if list.MenuCode == s.ParentCode {
+						treeLists[i].Children = append(treeLists[i].Children, s)
 					}
 				}
 			}
 		}
+	default:
+		menuClass := MenusClassFunc(role.RoleCode)
+	m:
+		for _, s := range menuClass.MenuList {
+			var menuTest Menu
+			var menuTests Menu
+			var treeListTest TreeList
+			for _, menu := range menuClass.Menu {
+				if menu.Id == uint(s) {
+					menuTest = menu
+				}
+			}
+			for _, menu := range menuClass.Menu {
+				if menu.MenuCode == menuTest.MenuCode {
+					menuTests = menu
+				}
+			}
+			if len(treeLists) == 0 {
+				treeListTest = TreeListPrepare(menuTests, nil)
+			} else {
+				for _, list := range treeLists {
+					if list.Id == menuTests.Id {
+						continue m
+					}
+					treeListTest = TreeListPrepare(menuTests, nil)
+				}
+			}
+			treeLists = append(treeLists, treeListTest)
+		}
+		sort.Sort(BySort(treeLists))
+		for i, list := range treeLists {
+			if list.MenuCode != 1 {
+				for _, s := range menuClass.MenuList {
+					for _, menu := range menuClass.Menu {
+						if menu.MenuCode == list.MenuCode && menu.Id == uint(s) {
+							treeLists[i].Children = append(treeLists[i].Children, menu)
+						}
+					}
+				}
+			}
+		}
+	}
+	sort.Sort(BySort(treeLists))
+	for _, list := range treeLists {
+		sort.Sort(MenusSort(list.Children))
 	}
 	return treeLists
 }
