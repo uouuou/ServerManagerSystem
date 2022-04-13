@@ -56,6 +56,7 @@ require (
 
 require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
+	github.com/duke-git/lancet/v2 v2.0.3
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.8.1

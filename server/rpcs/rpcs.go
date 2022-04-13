@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/duke-git/lancet/v2/datetime"
 	"github.com/gin-gonic/gin"
 	"github.com/hprose/hprose-golang/v3/io"
 	"github.com/hprose/hprose-golang/v3/rpc"
@@ -41,14 +42,20 @@ func AuthHandler(c context.Context, name string, args []interface{}, next core.N
 	// 通过RequestHeaders方法获取string来实现token和userid的获取从而实现校验
 	token := serviceContext.RequestHeaders().GetString("token")
 	userid := serviceContext.RequestHeaders().GetString("userid")
-	timeNow := time.Now().Format("2006-01-02 15")
-	tokenNow := mod.Md5V(userid + mid.GetAuth() + timeNow)
+	timestamp := serviceContext.RequestHeaders().GetString("timestamp")
+	timeUser, err := datetime.FormatStrToTime(timestamp, "2006-01-02 15:04:05")
+	if err != nil {
+		return nil, err
+	}
+	if time.Now().Hour()-timeUser.Hour() > 1 || time.Now().Hour()-timeUser.Hour() < 1 {
+		return nil, errors.New("token超时")
+	}
+	tokenNow := mod.Md5V(userid + mid.GetAuth() + timestamp)
 	if token == tokenNow {
 		return next(c, name, args)
 	} else {
-		return nil, errors.New("token check failed")
+		return nil, errors.New("token验证失败")
 	}
-
 }
 
 // ServiceCompressHandler 使用插件建立的一个gzip加密和压缩方案

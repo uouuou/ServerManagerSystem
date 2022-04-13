@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -96,11 +97,12 @@ func RpcClient() *rpc.Client {
 
 // AuthHandler 一个用户客户端验证的插件 NextInvokeHandler用于Handler的使用，还有NextIOHandler 是还没解码序列化的信息
 func AuthHandler(ctx context.Context, name string, args []interface{}, next core.NextInvokeHandler) (result []interface{}, err error) {
-	timeNow := time.Now().Format("2006-01-02 15")
-	token := mod.Md5V(mid.GetCUId() + mid.GetAuth() + timeNow)
+	timestamp := time.Now().Unix()
+	token := mod.Md5V(mid.GetCUId() + mid.GetAuth() + strconv.FormatInt(timestamp, 10))
 	headers := core.GetClientContext(ctx).RequestHeaders()
 	headers.Set("token", token)
 	headers.Set("userid", mid.GetCUId())
+	headers.Set("timestamp", timestamp)
 	return next(ctx, name, args)
 }
 
