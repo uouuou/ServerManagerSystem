@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/duke-git/lancet/v2/datetime"
+	"github.com/duke-git/lancet/convertor"
+	"github.com/duke-git/lancet/datetime"
 	"github.com/gin-gonic/gin"
 	"github.com/hprose/hprose-golang/v3/io"
 	"github.com/hprose/hprose-golang/v3/rpc"
@@ -43,11 +44,19 @@ func AuthHandler(c context.Context, name string, args []interface{}, next core.N
 	token := serviceContext.RequestHeaders().GetString("token")
 	userid := serviceContext.RequestHeaders().GetString("userid")
 	timestamp := serviceContext.RequestHeaders().GetString("timestamp")
-	timeUser, err := datetime.FormatStrToTime(timestamp, "2006-01-02 15:04:05")
+	toInt, err := convertor.ToInt(timestamp)
 	if err != nil {
 		return nil, err
 	}
-	if time.Now().Hour()-timeUser.Hour() > 1 || time.Now().Hour()-timeUser.Hour() < 1 {
+	timeUser, err := datetime.FormatStrToTime(time.Unix(toInt, 0).Format("2006-01-02 15:04:05"), "yyyy-mm-dd hh:mm:ss")
+	if err != nil {
+		return nil, err
+	}
+	if time.Now().Year() == timeUser.Year() && time.Now().Month() == timeUser.Month() && time.Now().Day() == timeUser.Day() {
+		if time.Now().Hour()-timeUser.Hour() >= 1 || time.Now().Hour()-timeUser.Hour() <= -1 {
+			return nil, errors.New("token超时")
+		}
+	} else {
 		return nil, errors.New("token超时")
 	}
 	tokenNow := mod.Md5V(userid + mid.GetAuth() + timestamp)
