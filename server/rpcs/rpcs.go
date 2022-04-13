@@ -129,7 +129,7 @@ func init() {
 	service.AddFunction(crons.RpcCronList, "RpcCronList")
 	//service.AddFunction(FTime,"Time")
 	//设置用户在连接成功后的反映
-	socketHandler := rpc.SocketHandler(service)
+	socketHandler := rpc.SocketHandler(service.Service)
 	Service = service
 	mid.Service = service
 	Caller = reverse.NewCaller(service.Service)
