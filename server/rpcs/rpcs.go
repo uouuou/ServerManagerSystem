@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/duke-git/lancet/convertor"
-	"github.com/duke-git/lancet/datetime"
 	"github.com/gin-gonic/gin"
 	"github.com/hprose/hprose-golang/v3/io"
 	"github.com/hprose/hprose-golang/v3/rpc"
@@ -48,16 +47,8 @@ func AuthHandler(c context.Context, name string, args []interface{}, next core.N
 	if err != nil {
 		return nil, err
 	}
-	timeUser, err := datetime.FormatStrToTime(time.Unix(toInt, 0).Format("2006-01-02 15:04:05"), "yyyy-mm-dd hh:mm:ss")
-	if err != nil {
-		return nil, err
-	}
-	if time.Now().Year() == timeUser.Year() && time.Now().Month() == timeUser.Month() && time.Now().Day() == timeUser.Day() {
-		if time.Now().Hour()-timeUser.Hour() >= 1 || time.Now().Hour()-timeUser.Hour() <= -1 {
-			return nil, errors.New("token超时")
-		}
-	} else {
-		return nil, errors.New("token超时")
+	if time.Now().Unix()-toInt <= 3600 || time.Now().Unix()-toInt >= -3600 {
+		return nil, errors.New("token已过期")
 	}
 	tokenNow := mod.Md5V(userid + mid.GetAuth() + timestamp)
 	if token == tokenNow {
