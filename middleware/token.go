@@ -14,7 +14,7 @@ func AutoInfo(token string, userid string, timestamp string) bool {
 	if err != nil {
 		return false
 	}
-	if time.Now().Unix()-toInt <= 3600 || time.Now().Unix()-toInt >= -3600 {
+	if time.Now().Unix()-toInt <= 3600 && time.Now().Unix()-toInt >= -3600 {
 		return false
 	}
 	tokenNow := Md5V(userid + "ServerManagerSystem2021" + timestamp)

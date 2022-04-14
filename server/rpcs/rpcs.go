@@ -47,7 +47,7 @@ func AuthHandler(c context.Context, name string, args []interface{}, next core.N
 	if err != nil {
 		return nil, err
 	}
-	if time.Now().Unix()-toInt <= 3600 || time.Now().Unix()-toInt >= -3600 {
+	if time.Now().Unix()-toInt <= 3600 && time.Now().Unix()-toInt >= -3600 {
 		return nil, errors.New("token已过期")
 	}
 	tokenNow := mod.Md5V(userid + mid.GetAuth() + timestamp)
