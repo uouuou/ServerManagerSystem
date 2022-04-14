@@ -10,7 +10,8 @@ func AuthAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userid := c.Query("userid")
 		token := c.Query("token")
-		if AutoInfo(token, userid) == true {
+		timestamp := c.Query("timestamp")
+		if AutoInfo(token, userid, timestamp) == true {
 			c.Next()
 		} else {
 			c.Abort()

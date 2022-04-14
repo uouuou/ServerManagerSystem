@@ -4,13 +4,20 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"github.com/duke-git/lancet/convertor"
 	"time"
 )
 
 // AutoInfo 内部方法的token验证
-func AutoInfo(token string, userid string) bool {
-	timeNow := time.Now().Format("2006-01-02 15")
-	tokenNow := Md5V(userid + "ServerManagerSystem2021" + timeNow)
+func AutoInfo(token string, userid string, timestamp string) bool {
+	toInt, err := convertor.ToInt(timestamp)
+	if err != nil {
+		return false
+	}
+	if time.Now().Unix()-toInt <= 3600 || time.Now().Unix()-toInt >= -3600 {
+		return false
+	}
+	tokenNow := Md5V(userid + "ServerManagerSystem2021" + timestamp)
 	return token == tokenNow
 }
 
