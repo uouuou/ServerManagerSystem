@@ -65,7 +65,7 @@ type MenusClass struct {
 func MenusClassFunc(role string) (m MenusClass) {
 	var menus []Menu
 	var roles []string
-	db.Where("authority = 1 and deleted_at IS NULL").Order("sort").Find(&menus)
+	db.Model(&Menu{}).Where("authority = 1").Order("sort").Find(&menus)
 	if role == "ADMIN" {
 		for _, s := range menus {
 			if s.ParentCode != 0 {
@@ -90,8 +90,20 @@ func MenusClassFunc(role string) (m MenusClass) {
 		for _, s := range roles {
 			for _, menu := range menus {
 				ss, _ := strconv.Atoi(s)
-				if menu.Id == uint(ss) && menu.ParentCode == 0 {
-					m.TopMenu = append(m.TopMenu, ss)
+				if menu.Id == uint(ss) {
+					if menu.ParentCode != 0 {
+						for _, ms := range menus {
+							if menu.ParentCode == ms.MenuCode && ms.ParentCode == 0 {
+								if intIn(int(ms.Id), m.TopMenu) == false {
+									m.TopMenu = append(m.TopMenu, int(ms.Id))
+								}
+							}
+						}
+					} else {
+						if intIn(ss, m.TopMenu) == false {
+							m.TopMenu = append(m.TopMenu, ss)
+						}
+					}
 				}
 			}
 		}
@@ -161,39 +173,10 @@ func GetRoleMenu(users mod.User, role user.Role) []TreeList {
 		}
 	default:
 		menuClass := MenusClassFunc(role.RoleCode)
-	m:
-		for _, s := range menuClass.MenuList {
-			var menuTest Menu
-			var menuTests Menu
-			var treeListTest TreeList
-			for _, menu := range menuClass.Menu {
-				if menu.Id == uint(s) {
-					menuTest = menu
-				}
-			}
-			for _, menu := range menuClass.Menu {
-				if menu.MenuCode == menuTest.MenuCode {
-					menuTests = menu
-				}
-			}
-			if len(treeLists) == 0 {
-				treeListTest = TreeListPrepare(menuTests, nil)
-			} else {
-				for _, list := range treeLists {
-					if list.Id == menuTests.Id {
-						continue m
-					}
-					treeListTest = TreeListPrepare(menuTests, nil)
-				}
-			}
-			treeLists = append(treeLists, treeListTest)
-		}
-		for _, menu := range menuClass.TopMenu {
-			if menu == 1 {
-				for _, m := range menuClass.Menu {
-					if m.Id == uint(menu) {
-						treeLists = append(treeLists, TreeListPrepare(m, nil))
-					}
+		for _, topMenu := range menuClass.TopMenu {
+			for _, m := range menuClass.Menu {
+				if m.Id == uint(topMenu) {
+					treeLists = append(treeLists, TreeListPrepare(m, nil))
 				}
 			}
 		}
@@ -354,4 +337,14 @@ func DelMenu(c *gin.Context) {
 	} else {
 		mid.DataNot(c, nil, "该菜单不存在")
 	}
+}
+
+//检车结构中有无该数字
+func intIn(num int, nums []int) bool {
+	for _, v := range nums {
+		if v == num {
+			return true
+		}
+	}
+	return false
 }

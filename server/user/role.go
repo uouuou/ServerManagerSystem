@@ -95,6 +95,7 @@ func (r Role) Edit(c *gin.Context) {
 // Del 删除角色
 func (r Role) Del(c *gin.Context) {
 	var req RoleRequest
+	var user mod.User
 	err := c.BindJSON(&req)
 	if err != nil {
 		mid.ClientErr(c, err, "数据绑定错误")
@@ -106,6 +107,10 @@ func (r Role) Del(c *gin.Context) {
 	}
 	if req.ID == 1 {
 		mid.DataNot(c, nil, "不可删除默认权限")
+		return
+	}
+	if u := db.Model(&user).Where("role_id = ?", req.ID).Find(&user).RowsAffected; u > 0 {
+		mid.DataNot(c, nil, "该角色下存在用户，不可删除")
 		return
 	}
 	if err = db.Model(&r).Where("id = ?", req.ID).Delete(&r).Error; err != nil {
