@@ -65,7 +65,7 @@ type MenusClass struct {
 func MenusClassFunc(role string) (m MenusClass) {
 	var menus []Menu
 	var roles []string
-	db.Model(&Menu{}).Where("authority = 1").Order("sort").Find(&menus)
+	db.Model(&Menu{}).Where("authority = 1 and deleted_at is null").Order("sort").Find(&menus)
 	if role == "ADMIN" {
 		for _, s := range menus {
 			if s.ParentCode != 0 {
