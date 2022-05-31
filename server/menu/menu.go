@@ -206,27 +206,13 @@ func GetMenuLists(c *gin.Context) {
 		treeLists []TreeList
 		pages     mid.Pages
 	)
-	page, _ := strconv.Atoi(c.Query("page"))
-	pageSize, _ := strconv.Atoi(c.Query("page_size"))
-	Db := db.Model(&menus)
-	pages.TotalAmount = Db.Where("parent_code = 0 and deleted_at IS NULL").Find(&menus).RowsAffected
-	if page > 0 && pageSize > 0 {
-		Db.Limit(pageSize).Offset((page - 1) * pageSize)
-		pages.Page = page
-		pages.PageSize = pageSize
-
-	} else if pageSize == -1 {
-		pages.Page = page
-		pages.PageSize = pageSize
-	} else {
-		Db = Db.Limit(15)
-	}
-	Db.Where("parent_code = 0 and deleted_at IS NULL").Order("sort").Group("menu_code").Find(&menus)
+	pages, dbNow := mid.GetPages(db, c.Query("page"), c.Query("page_size"), &mod.Menu{})
+	dbNow.Model(&mod.Menu{}).Where("parent_code = 0").Order("sort").Group("menu_code").Find(&menus)
 	for _, v := range menus {
 		var treeList TreeList
 		var menu []Menu
 		if v.MenuCode != 1 {
-			db.Where("menu_code = ? and parent_code != 0  and deleted_at IS NULL", v.MenuCode).Order("sort").Find(&menus)
+			db.Model(&mod.Menu{}).Where("menu_code = ? and parent_code != 0", v.MenuCode).Order("sort").Find(&menus)
 			for _, s := range menus {
 				menu = append(menu, s)
 			}
@@ -242,7 +228,7 @@ func GetMenuLists(c *gin.Context) {
 		treeList.Authority = v.Authority
 		treeLists = append(treeLists, treeList)
 	}
-	mid.DataPageOk(c, pages, treeLists, "success")
+	mid.DataPageOk(c, pages, treeLists, "Success")
 }
 
 // AddMenu 新增菜单
